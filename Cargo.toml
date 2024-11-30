@@ -7,7 +7,6 @@ description = "Provides the types representing all messages in the PixelWeather 
 rust-version = "1.83"
 homepage = "https://github.com/PixelWeatherProject"
 license-file = "LICENSE"
-license = "CC BY-NC-ND 4.0"
 readme = "README.md"
 repository = "https://github.com/PixelWeatherProject/pwmp-msg"
 
