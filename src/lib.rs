@@ -1,3 +1,5 @@
+pub use rust_decimal::Decimal;
+pub use rust_decimal_macros::dec;
 use serde::{Deserialize, Serialize};
 
 pub mod aliases;
