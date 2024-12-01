@@ -47,6 +47,20 @@ pub enum Request {
     /// Retrieve the node's settings from the database.
     GetSettings(Box<[SettingName]>),
 
+    /// Check for a firmware update.
+    UpdateCheck(u8, u8, u8),
+
+    /// Request a part of a firmware upgrade.
+    GetUpgradePart {
+        /// Firmware version to request.
+        version: (u8, u8, u8),
+        /// Maximum size of the part.
+        size: u32,
+    },
+
+    /// Report bad firmware and opt out of this version.
+    ReportBadFirmware(u8, u8, u8),
+
     /// Tell the server that the session is over and the node will disconnect.
     Bye,
 }

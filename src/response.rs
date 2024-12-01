@@ -13,6 +13,15 @@ pub enum Response {
     /// The server has rejected authentication. The node/client will be disconnected.
     Reject,
 
+    /// No new firmware update is available.
+    FirmwareUpToDate,
+
+    /// Part of a firmware upgrade.
+    FirmwarePart(Box<[u8]>),
+
+    /// Firmware update available.
+    UpdateAvailable(u8, u8, u8),
+
     /// List of setting values requested by [`Request::GetSettings`](crate::request::Request::GetSettings).
     /// The values are ordered in the same way as they were requested.
     Settings(Box<[SettingValue]>),
