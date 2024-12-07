@@ -50,13 +50,17 @@ pub enum Request {
     /// Check for a firmware update.
     UpdateCheck(u8, u8, u8),
 
-    /// Request a part of a firmware upgrade.
-    GetUpgradePart {
-        /// Firmware version to request.
-        version: (u8, u8, u8),
-        /// Maximum size of the part.
-        size: u32,
+    /// Request the latest firmware update.
+    ///
+    /// Clients/Nodes are **not** allowed to specify which firmware version they want.
+    /// The PWMP server handles selecting the latest update.
+    Update {
+        /// Specify how large update chunks shall be.
+        hunk_size: usize,
     },
+
+    /// Request a part of a firmware upgrade.
+    NextUpdateChunk,
 
     /// Report bad firmware and opt out of this version.
     ReportBadFirmware(u8, u8, u8),

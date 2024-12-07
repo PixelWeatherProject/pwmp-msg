@@ -16,11 +16,14 @@ pub enum Response {
     /// No new firmware update is available.
     FirmwareUpToDate,
 
-    /// Part of a firmware upgrade.
-    FirmwarePart(Box<[u8]>),
-
     /// Firmware update available.
     UpdateAvailable(u8, u8, u8),
+
+    /// Part of a firmware update.
+    UpdatePart(Box<[u8]>),
+
+    /// End of firmware update chunks.
+    UpdateEnd,
 
     /// List of setting values requested by [`Request::GetSettings`](crate::request::Request::GetSettings).
     /// The values are ordered in the same way as they were requested.
