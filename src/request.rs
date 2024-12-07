@@ -56,7 +56,7 @@ pub enum Request {
     /// The PWMP server handles selecting the latest update.
     Update {
         /// Specify how large update chunks shall be.
-        hunk_size: usize,
+        chunk_size: usize,
     },
 
     /// Request a part of a firmware upgrade.
