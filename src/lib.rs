@@ -6,6 +6,7 @@ pub mod aliases;
 pub mod mac;
 pub mod request;
 pub mod response;
+pub mod settings;
 
 /// A Message object.
 /// Can either be a request or a response.

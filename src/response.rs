@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::settings::NodeSettings;
+
 /// A response message used by the PWMP server to respond to [`Request`](crate::request::Request)s.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub enum Response {
@@ -25,11 +27,5 @@ pub enum Response {
     UpdateEnd,
 
     /// Node settings.
-    Settings {
-        battery_ignore: bool,
-        ota: bool,
-        sleep_time: u16,
-        sbop: bool,
-        mute_notifications: bool,
-    },
+    Settings(NodeSettings),
 }
