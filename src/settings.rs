@@ -2,9 +2,9 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct NodeSettings {
-    battery_ignore: bool,
-    ota: bool,
-    sleep_time: u16,
-    sbop: bool,
-    mute_notifications: bool,
+    pub battery_ignore: bool,
+    pub ota: bool,
+    pub sleep_time: u16,
+    pub sbop: bool,
+    pub mute_notifications: bool,
 }
