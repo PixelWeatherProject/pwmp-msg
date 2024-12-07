@@ -1,7 +1,6 @@
 use crate::{
     aliases::{AirPressure, BatteryVoltage, Humidity, Rssi, Temperature},
     mac::Mac,
-    settings::SettingName,
 };
 use serde::{Deserialize, Serialize};
 
@@ -45,7 +44,7 @@ pub enum Request {
     SendNotification(Box<str>),
 
     /// Retrieve the node's settings from the database.
-    GetSettings(Box<[SettingName]>),
+    GetSettings,
 
     /// Check for a firmware update.
     UpdateCheck(u8, u8, u8),
