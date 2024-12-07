@@ -72,4 +72,18 @@ impl Message {
             None
         }
     }
+
+    /// Returns the length of the message if it was serialized.
+    /// ```rust
+    /// # use pwmp_types::{Message, response::Response, request::Request};
+    /// let ping = Message::Request(Request::Ping);
+    /// let pong = Message::Response(Response::Pong);
+    ///
+    /// assert_eq!(ping.size(), 8);
+    /// assert_eq!(pong.size(), 8);
+    /// ```
+    #[must_use]
+    pub fn size(&self) -> usize {
+        bincode::serialized_size(self).unwrap() as usize
+    }
 }
