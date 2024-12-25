@@ -1,6 +1,5 @@
-use std::fmt::Display;
-
 use serde::{Deserialize, Serialize};
+use std::{fmt::Display, str::FromStr};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
 pub struct Version {
@@ -16,6 +15,16 @@ impl Version {
             middle,
             minor,
         }
+    }
+
+    pub fn parse<S: AsRef<str>>(input: S) -> Option<Self> {
+        let mut parts = input.as_ref().splitn(2, '.');
+
+        let major = u8::from_str(parts.next()?).ok()?;
+        let middle = u8::from_str(parts.next()?).ok()?;
+        let minor = u8::from_str(parts.next()?).ok()?;
+
+        Some(Self::new(major, middle, minor))
     }
 
     pub const fn major(&self) -> u8 {
