@@ -1,6 +1,5 @@
+use crate::{settings::NodeSettings, version::Version};
 use serde::{Deserialize, Serialize};
-
-use crate::settings::NodeSettings;
 
 /// A response message used by the PWMP server to respond to [`Request`](crate::request::Request)s.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
@@ -18,7 +17,7 @@ pub enum Response {
     FirmwareUpToDate,
 
     /// Firmware update available.
-    UpdateAvailable(u8, u8, u8),
+    UpdateAvailable(Version),
 
     /// Part of a firmware update.
     UpdatePart(Box<[u8]>),

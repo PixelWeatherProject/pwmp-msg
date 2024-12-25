@@ -1,6 +1,7 @@
 use crate::{
     aliases::{AirPressure, BatteryVoltage, Humidity, Rssi, Temperature},
     mac::Mac,
+    version::Version,
 };
 use serde::{Deserialize, Serialize};
 
@@ -47,22 +48,17 @@ pub enum Request {
     GetSettings,
 
     /// Check for a firmware update.
-    UpdateCheck(u8, u8, u8),
+    /// This will also cache the update on the server.
+    UpdateCheck(Version),
 
-    /// Request the latest firmware update.
+    /// Request a part of a firmware upgrade. The parameter is the maximum chunk size that shall be received.
     ///
-    /// Clients/Nodes are **not** allowed to specify which firmware version they want.
-    /// The PWMP server handles selecting the latest update.
-    Update {
-        /// Specify how large update chunks shall be.
-        chunk_size: usize,
-    },
+    /// **The client must request an update check first before sending this request.**
+    NextUpdateChunk(usize),
 
-    /// Request a part of a firmware upgrade.
-    NextUpdateChunk,
-
-    /// Report bad firmware and opt out of this version.
-    ReportBadFirmware(u8, u8, u8),
+    /// Report back about the updated firmware version.
+    /// The parameter means whether this new firmware is working, or was bad, and the node has rolled back to a previous version.
+    ReportFirmwareUpdate(bool),
 
     /// Tell the server that the session is over and the node will disconnect.
     Bye,
