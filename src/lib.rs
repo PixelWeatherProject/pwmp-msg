@@ -7,6 +7,7 @@ pub mod mac;
 pub mod request;
 pub mod response;
 pub mod settings;
+pub mod version;
 
 /// A Message object.
 /// Can either be a request or a response.
