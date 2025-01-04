@@ -18,7 +18,7 @@ impl Version {
     }
 
     pub fn parse<S: AsRef<str>>(input: S) -> Option<Self> {
-        let mut parts = input.as_ref().splitn(2, '.');
+        let mut parts = input.as_ref().splitn(3, '.');
 
         let major = u8::from_str(parts.next()?).ok()?;
         let middle = u8::from_str(parts.next()?).ok()?;
