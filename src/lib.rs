@@ -76,7 +76,7 @@ impl Message {
 
     /// Returns the length of the message if it was serialized.
     /// ```rust
-    /// # use pwmp_types::{Message, response::Response, request::Request};
+    /// # use pwmp_msg::{Message, response::Response, request::Request};
     /// let ping = Message::Request(Request::Ping);
     /// let pong = Message::Response(Response::Pong);
     ///
