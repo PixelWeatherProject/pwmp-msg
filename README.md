@@ -39,7 +39,6 @@ graph TD;
 
 ### Ping test message (`Ping`)
 The `Pind` message is only used for testing if the connection to the server is alive. The server will respond with a `Pong` message.
-```
 
 ### Introduction message (`Hello`)
 The `Hello` message is the first message sent by the client (node) to the server. It contains the MAC address of the client. The server will respond with an `Ok` message if the client is authorized to communicate with the server.
