@@ -21,6 +21,9 @@ pub enum Message {
 
 impl Message {
     /// Serialize the message into raw bytes.
+    ///
+    /// # Panics
+    /// This will panic if the message could not be serialized.
     #[must_use]
     pub fn serialize(self) -> Vec<u8> {
         bincode::serialize(&self).unwrap()
@@ -75,6 +78,11 @@ impl Message {
     }
 
     /// Returns the length of the message if it was serialized.
+    ///
+    /// # Panics
+    /// This will panic if the message could not be serialized.
+    ///
+    /// # Example
     /// ```rust
     /// # use pwmp_msg::{Message, response::Response, request::Request};
     /// let ping = Message::Request(Request::Ping);
@@ -83,6 +91,7 @@ impl Message {
     /// assert_eq!(ping.size(), 8);
     /// assert_eq!(pong.size(), 8);
     /// ```
+    #[allow(clippy::cast_possible_truncation)] // This could only be an issue on systems where `usize` is 32-bit
     #[must_use]
     pub fn size(&self) -> usize {
         bincode::serialized_size(self).unwrap() as usize

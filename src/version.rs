@@ -9,6 +9,7 @@ pub struct Version {
 }
 
 impl Version {
+    #[must_use]
     pub const fn new(major: u8, middle: u8, minor: u8) -> Self {
         Self {
             major,
@@ -27,18 +28,22 @@ impl Version {
         Some(Self::new(major, middle, minor))
     }
 
+    #[must_use]
     pub const fn major(&self) -> u8 {
         self.major
     }
 
+    #[must_use]
     pub const fn middle(&self) -> u8 {
         self.middle
     }
 
+    #[must_use]
     pub const fn minor(&self) -> u8 {
         self.minor
     }
 
+    #[must_use]
     pub const fn to_signed_triple(&self) -> (i16, i16, i16) {
         (self.major as _, self.middle as _, self.minor as _)
     }
