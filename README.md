@@ -20,15 +20,25 @@ graph TD;
     Request-.->Hello
     Request-.->PostResults
     Request-.->PostStats
-    Request-.->Bye
+    Request-.->SendNotification
     Request-.->GetSetting
-    Request-.->GetSettings
+    Request-.->UpdateCheck
+    Request-.->NextUpdateChunk
+    Request-.->ReportFirmwareUpdate
+    Request-.->Bye
 
     Response-.->Pong
     Response-.->Ok
     Response-.->Reject
-    Response-.->Setting
+    Response-.->FirmwareUpToDate
+    Response-.->UpdateAvailable
+    Response-.->UpdatePart
+    Response-.->UpdateEnd
     Response-.->Settings
+```
+
+### Ping test message (`Ping`)
+The `Pind` message is only used for testing if the connection to the server is alive. The server will respond with a `Pong` message.
 ```
 
 ### Introduction message (`Hello`)
@@ -86,13 +96,44 @@ graph LR;
 ```mermaid
 sequenceDiagram
     Node->>Server: Hello (incl. MAC address)
-    Server->>Node: Ok
+
+    alt Known MAC, Successful authentication
+        Server->>Node: Ok
+    else Unknown MAC
+        Server--xNode: Reject
+    end
+    
     Node->>Server: GetSettings [...]
     Server->>Node: Settings [...]
     Node->>Server: PostResults [temperature, humidity, ...]
     Server->>Node: Ok
     Node->>Server: PostStats (node statistics)
     Server->>Node: Ok
+    Node->>Server: UpdateCheck [current version]
+
+    opt Detected rollback from bad firmware
+        Node->>Server: ReportFirmwareUpdate [false]
+        Server->>Node: Ok
+    end
+
+    opt Successfull update
+        Node->>Server: ReportFirmwareUpdate [true]
+        Server->>Node: Ok
+    end
+
+    alt Update available
+        Server->>Node: UpdateAvailable
+        
+        loop Download update
+            Node->>Server: NextUpdateChunk [chunk size]
+            Server->>Node: UpdatePart [...]
+        end
+
+        Server->>Node: UpdateEnd
+    else Already up to date
+        Server->>Node: FirmwareUpToDate
+    end
+
     Node->>Server: Bye
 ```
 
