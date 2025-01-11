@@ -26,13 +26,13 @@ impl Message {
     /// This will panic if the message could not be serialized.
     #[must_use]
     pub fn serialize(self) -> Vec<u8> {
-        bincode::serialize(&self).unwrap()
+        postcard::to_stdvec(&self).unwrap()
     }
 
     /// Deserialize a message from raw bytes.
     #[must_use]
     pub fn deserialize(bytes: &[u8]) -> Option<Self> {
-        bincode::deserialize(bytes).ok()
+        postcard::from_bytes(bytes).ok()
     }
 
     /// Returns a reference to the contained [`Request`].
@@ -94,6 +94,6 @@ impl Message {
     #[allow(clippy::cast_possible_truncation)] // This could only be an issue on systems where `usize` is 32-bit
     #[must_use]
     pub fn size(&self) -> usize {
-        bincode::serialized_size(self).unwrap() as usize
+        postcard::to_stdvec(self).unwrap().len()
     }
 }
