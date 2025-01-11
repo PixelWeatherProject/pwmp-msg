@@ -19,4 +19,4 @@ rust_decimal = { version = "1.36.0", default-features = false, features = [
     "serde",
 ] }
 rust_decimal_macros = { version = "1.36.0", features = ["reexportable"] }
-serde = { version = "1.0.216", features = ["derive"] }
+serde = { version = "1.0.217", features = ["derive"] }
