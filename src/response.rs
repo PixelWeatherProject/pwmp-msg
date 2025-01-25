@@ -26,5 +26,5 @@ pub enum Response {
     UpdateEnd,
 
     /// Node settings.
-    Settings(NodeSettings),
+    Settings(Option<NodeSettings>),
 }
