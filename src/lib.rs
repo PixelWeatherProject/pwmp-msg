@@ -88,8 +88,8 @@ impl Message {
     /// let ping = Message::Request(Request::Ping);
     /// let pong = Message::Response(Response::Pong);
     ///
-    /// assert_eq!(ping.size(), 8);
-    /// assert_eq!(pong.size(), 8);
+    /// assert_eq!(ping.size(), 2);
+    /// assert_eq!(pong.size(), 2);
     /// ```
     #[must_use]
     pub fn size(&self) -> usize {
