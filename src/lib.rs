@@ -1,4 +1,4 @@
-use bytes::Bytes;
+pub use bytes::Bytes;
 pub use rust_decimal::Decimal;
 pub use rust_decimal_macros::dec;
 use serde::{Deserialize, Serialize};
