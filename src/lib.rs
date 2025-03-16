@@ -59,7 +59,7 @@ impl Message {
 
     /// Similar to [`request()`](Self::request), but consumes the message itself.
     #[must_use]
-    pub fn as_request(self) -> Option<request::Request> {
+    pub fn take_request(self) -> Option<request::Request> {
         if let Self::Request(req) = self {
             Some(req)
         } else {
@@ -69,7 +69,7 @@ impl Message {
 
     /// Similar to [`response()`](Self::response), but consumes the message itself.
     #[must_use]
-    pub fn as_response(self) -> Option<response::Response> {
+    pub fn take_response(self) -> Option<response::Response> {
         if let Self::Response(resp) = self {
             Some(resp)
         } else {
