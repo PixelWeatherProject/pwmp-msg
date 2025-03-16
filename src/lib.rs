@@ -1,3 +1,4 @@
+use bytes::Bytes;
 pub use rust_decimal::Decimal;
 pub use rust_decimal_macros::dec;
 use serde::{Deserialize, Serialize};
@@ -26,13 +27,13 @@ impl Message {
     /// # Panics
     /// This will panic if the message could not be serialized.
     #[must_use]
-    pub fn serialize(self) -> Vec<u8> {
-        postcard::to_stdvec(&self).unwrap()
+    pub fn serialize(self) -> Bytes {
+        postcard::to_stdvec(&self).unwrap().into()
     }
 
     /// Deserialize a message from raw bytes.
     #[must_use]
-    pub fn deserialize(bytes: &[u8]) -> Option<Self> {
+    pub fn deserialize(bytes: &Bytes) -> Option<Self> {
         postcard::from_bytes(bytes).ok()
     }
 
