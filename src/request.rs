@@ -12,7 +12,7 @@ pub enum Request {
     Ping,
 
     /// Ask to server to authorize the node using it's MAC address.
-    Hello {
+    Handshake {
         #[allow(clippy::doc_markdown)]
         /// The node's MAC address. This address should be that of the WiFi interface.
         mac: Mac,

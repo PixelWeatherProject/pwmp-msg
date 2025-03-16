@@ -7,11 +7,14 @@ pub enum Response {
     /// A response message to [`Request::Ping`](crate::request::Request::Ping).
     Pong,
 
+    /// Response to a successful handshake, with the node's ID.
+    HandshakeSuccess { node_id: i16 },
+
+    /// The server has rejected the handshake. Optionally a reason may be provided.
+    HandshakeFailed(Option<Box<str>>),
+
     /// Indicate a successfully processed request. This is usually used as a response to `Request::Post*` messages.
     Ok,
-
-    /// The server has rejected authentication. The node/client will be disconnected.
-    Reject,
 
     /// No new firmware update is available.
     FirmwareUpToDate,
