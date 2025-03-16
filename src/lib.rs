@@ -3,6 +3,7 @@ pub use rust_decimal_macros::dec;
 use serde::{Deserialize, Serialize};
 
 pub mod aliases;
+mod kick;
 pub mod mac;
 pub mod request;
 pub mod response;

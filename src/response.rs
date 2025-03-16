@@ -1,3 +1,4 @@
+pub use crate::kick::KickReason;
 use crate::{settings::NodeSettings, version::Version};
 use serde::{Deserialize, Serialize};
 
@@ -15,6 +16,9 @@ pub enum Response {
 
     /// Indicate a successfully processed request. This is usually used as a response to `Request::Post*` messages.
     Ok,
+
+    /// The server has kicked the client.
+    Kicked(KickReason),
 
     /// No new firmware update is available.
     FirmwareUpToDate,
