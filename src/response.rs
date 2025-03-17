@@ -2,7 +2,7 @@ use crate::{settings::NodeSettings, version::Version};
 use serde::{Deserialize, Serialize};
 
 /// A response message used by the PWMP server to respond to [`Request`](crate::request::Request)s.
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
 pub enum Response {
     /// A response message to [`Request::Ping`](crate::request::Request::Ping).
     Pong,
@@ -20,7 +20,10 @@ pub enum Response {
     UpdateAvailable(Version),
 
     /// Part of a firmware update.
-    UpdatePart(Box<[u8]>),
+    UpdatePart {
+        content: [u8; size_of::<u16>()],
+        len: u16,
+    },
 
     /// End of firmware update chunks.
     UpdateEnd,

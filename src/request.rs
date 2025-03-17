@@ -2,11 +2,12 @@ use crate::{
     aliases::{AirPressure, BatteryVoltage, Humidity, Rssi, Temperature},
     mac::Mac,
     version::Version,
+    Essid, NotificationMessage,
 };
 use serde::{Deserialize, Serialize};
 
 /// A request message used by nodes to ask the PWMP server to perform an operation.
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
 pub enum Request {
     /// Used to check if the server is alive.
     Ping,
@@ -33,7 +34,7 @@ pub enum Request {
         /// Node's battery voltage
         battery: BatteryVoltage,
         /// ESSID of the wireless network
-        wifi_ssid: Box<str>,
+        wifi_ssid: Essid,
         /// RSSI *(signal quality)* of the connection to the wireless network in dBm *(decibel meters)*.
         /// Higher values (closer to 0) mean a better quality.
         wifi_rssi: Rssi,
@@ -42,7 +43,7 @@ pub enum Request {
     /// Store a notification in the database. These can be read by other applications.
     ///
     /// Notifications are usually used to inform about low battery status.
-    SendNotification(Box<str>),
+    SendNotification(NotificationMessage),
 
     /// Retrieve the node's settings from the database.
     GetSettings,

@@ -9,9 +9,13 @@ pub mod response;
 pub mod settings;
 pub mod version;
 
+pub type Essid = arrayvec::ArrayString<32>;
+pub type NotificationMessage = arrayvec::ArrayString<512>;
+
 /// A Message object.
 /// Can either be a request or a response.
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[allow(clippy::large_enum_variant)]
 pub enum Message {
     /// Server requested data from a client or vice-versa.
     Request(request::Request),
