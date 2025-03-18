@@ -139,6 +139,27 @@ impl Message {
 
     /// Returns a reference to the contained [`Request`].
     /// If the message contains a [`Response`] instead, `None` is returned.
+    ///
+    /// ```rust
+    /// use pwmp_msg::{Message, request::Request};
+    ///
+    /// let id = 1;
+    /// let original_request = Request::Ping;
+    /// let message = Message::new_request(original_request.clone(), id);
+    /// let wrapped_request = message.request();
+    ///
+    /// assert_eq!(wrapped_request, Some(&original_request));
+    /// ```
+    ///
+    /// ```rust
+    /// use pwmp_msg::{Message, response::Response};
+    ///
+    /// let id = 1;
+    /// let response = Response::Pong;
+    /// let message = Message::new_response(response, id);
+    ///
+    /// assert_eq!(message.request(), None);
+    /// ```
     #[must_use]
     pub const fn request(&self) -> Option<&request::Request> {
         if let MessageContent::Request(req) = &self.content {
@@ -150,6 +171,27 @@ impl Message {
 
     /// Returns a reference to the contained [`Response`].
     /// If the message contains a [`Request`] instead, `None` is returned.
+    ///
+    /// ```rust
+    /// use pwmp_msg::{Message, response::Response};
+    ///
+    /// let id = 1;
+    /// let original_response = Response::Pong;
+    /// let message = Message::new_response(original_response.clone(), id);
+    /// let wrapped_response = message.response();
+    ///
+    /// assert_eq!(wrapped_response, Some(&original_response));
+    /// ```
+    ///
+    /// ```rust
+    /// use pwmp_msg::{Message, request::Request};
+    ///
+    /// let id = 1;
+    /// let request = Request::Ping;
+    /// let message = Message::new_request(request, id);
+    ///
+    /// assert_eq!(message.response(), None);
+    /// ```
     #[must_use]
     pub const fn response(&self) -> Option<&response::Response> {
         if let MessageContent::Response(res) = &self.content {
@@ -160,6 +202,27 @@ impl Message {
     }
 
     /// Similar to [`request()`](Self::request), but consumes the message itself.
+    ///
+    /// ```rust
+    /// use pwmp_msg::{Message, request::Request};
+    ///
+    /// let id = 1;
+    /// let original_request = Request::Ping;
+    /// let message = Message::new_request(original_request.clone(), id);
+    /// let wrapped_request = message.take_request();
+    ///
+    /// assert_eq!(wrapped_request, Some(original_request));
+    /// ```
+    ///
+    /// ```rust
+    /// use pwmp_msg::{Message, response::Response};
+    ///
+    /// let id = 1;
+    /// let response = Response::Pong;
+    /// let message = Message::new_response(response, id);
+    ///
+    /// assert_eq!(message.take_request(), None);
+    /// ```
     #[must_use]
     pub fn take_request(self) -> Option<request::Request> {
         if let MessageContent::Request(req) = self.content {
@@ -170,6 +233,27 @@ impl Message {
     }
 
     /// Similar to [`response()`](Self::response), but consumes the message itself.
+    ///
+    /// ```rust
+    /// use pwmp_msg::{Message, response::Response};
+    ///
+    /// let id = 1;
+    /// let original_response = Response::Pong;
+    /// let message = Message::new_response(original_response.clone(), id);
+    /// let wrapped_response = message.take_response();
+    ///
+    /// assert_eq!(wrapped_response, Some(original_response));
+    /// ```
+    ///
+    /// ```rust
+    /// use pwmp_msg::{Message, request::Request};
+    ///
+    /// let id = 1;
+    /// let request = Request::Ping;
+    /// let message = Message::new_request(request, id);
+    ///
+    /// assert_eq!(message.take_response(), None);
+    /// ```
     #[must_use]
     pub fn take_response(self) -> Option<response::Response> {
         if let MessageContent::Response(res) = self.content {
@@ -180,6 +264,26 @@ impl Message {
     }
 
     /// Returns the message ID.
+    ///
+    /// ```rust
+    /// use pwmp_msg::{Message, request::Request};
+    ///
+    /// let id = 1;
+    /// let request = Request::Ping;
+    /// let message = Message::new_request(request, id);
+    ///
+    /// assert_eq!(message.id(), id);
+    /// ```
+    ///
+    /// ```rust
+    /// use pwmp_msg::{Message, response::Response};
+    ///
+    /// let id = 1;
+    /// let response = Response::Pong;
+    /// let message = Message::new_response(response, id);
+    ///
+    /// assert_eq!(message.id(), id);
+    /// ```
     #[must_use]
     pub const fn id(&self) -> u32 {
         self.id

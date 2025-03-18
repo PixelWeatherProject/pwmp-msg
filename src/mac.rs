@@ -18,6 +18,20 @@ pub struct MacParseError;
 
 impl Mac {
     /// Create a new instance with the specified octets.
+    ///
+    /// ```rust
+    /// use pwmp_msg::mac::Mac;
+    ///
+    /// let mac = Mac::new(0xFF, 0xFF, 0xDE, 0xAD, 0xBE, 0xEF);
+    ///
+    /// assert_eq!(mac[0], 0xFF);
+    /// assert_eq!(mac[1], 0xFF);
+    /// assert_eq!(mac[2], 0xDE);
+    /// assert_eq!(mac[3], 0xAD);
+    /// assert_eq!(mac[4], 0xBE);
+    /// assert_eq!(mac[5], 0xEF);
+    /// assert_eq!(mac.to_string(), "FF:FF:DE:AD:BE:EF");
+    /// ```
     #[must_use]
     #[allow(clippy::many_single_char_names)]
     pub const fn new(a: u8, b: u8, c: u8, d: u8, e: u8, f: u8) -> Self {
