@@ -36,6 +36,19 @@ enum MessageContent {
 }
 
 impl Message {
+    /// Wrap a request and assign the given ID to the message.
+    ///
+    /// # Example
+    /// ```rust
+    /// use pwmp_msg::{Message, request::Request};
+    ///
+    /// let id = 1;
+    /// let request = Request::Ping;
+    /// let message = Message::new_request(request.clone(), id);
+    ///
+    /// assert_eq!(message.id(), id);
+    /// assert_eq!(message.take_request(), Some(request));
+    /// ```
     pub const fn new_request(req: request::Request, id: u32) -> Self {
         Self {
             id,
@@ -43,6 +56,19 @@ impl Message {
         }
     }
 
+    /// Wrap a response and assign the given ID to the message.
+    ///
+    /// # Example
+    /// ```rust
+    /// use pwmp_msg::{Message, response::Response};
+    ///
+    /// let id = 1;
+    /// let response = Response::Pong;
+    /// let message = Message::new_response(response.clone(), id);
+    ///
+    /// assert_eq!(message.id(), id);
+    /// assert_eq!(message.take_response(), Some(response));
+    /// ```
     pub const fn new_response(res: response::Response, id: u32) -> Self {
         Self {
             id,
@@ -52,6 +78,25 @@ impl Message {
 
     /// Serialize the message into raw bytes.
     ///
+    /// # Example
+    /// ```rust
+    /// use pwmp_msg::{Message, request::Request};
+    ///
+    /// let id = 1;
+    /// let request = Request::Ping;
+    /// let message = Message::new_request(request, id);
+    /// let bytes = message.serialize();
+    /// ```
+    ///
+    /// ```rust
+    /// use pwmp_msg::{Message, response::Response};
+    ///
+    /// let id = 1;
+    /// let response = Response::Pong;
+    /// let message = Message::new_response(response, id);
+    /// let bytes = message.serialize();
+    /// ```
+    ///
     /// # Panics
     /// This will panic if the message could not be serialized.
     #[must_use]
@@ -60,6 +105,33 @@ impl Message {
     }
 
     /// Deserialize a message from raw bytes.
+    ///
+    /// # Example
+    /// ```rust
+    /// use pwmp_msg::{Message, request::Request};
+    ///
+    /// let id = 1;
+    /// let request = Request::Ping;
+    /// let message = Message::new_request(request, id);
+    ///
+    /// let bytes = message.clone().serialize();
+    /// let original_message = Message::deserialize(&bytes).unwrap();
+    ///
+    /// assert_eq!(message, original_message);
+    /// ```
+    ///
+    /// ```rust
+    /// use pwmp_msg::{Message, response::Response};
+    ///
+    /// let id = 1;
+    /// let response = Response::Pong;
+    /// let message = Message::new_response(response, id);
+    ///
+    /// let bytes = message.clone().serialize();
+    /// let original_message = Message::deserialize(&bytes).unwrap();
+    ///
+    /// assert_eq!(message, original_message);
+    /// ```
     #[must_use]
     pub fn deserialize(bytes: &[u8]) -> Option<Self> {
         postcard::from_bytes(bytes).ok()
@@ -99,11 +171,17 @@ impl Message {
 
     /// Similar to [`response()`](Self::response), but consumes the message itself.
     #[must_use]
-    pub fn as_response(self) -> Option<response::Response> {
+    pub fn take_response(self) -> Option<response::Response> {
         if let MessageContent::Response(res) = self.content {
             Some(res)
         } else {
             None
         }
+    }
+
+    /// Returns the message ID.
+    #[must_use]
+    pub const fn id(&self) -> u32 {
+        self.id
     }
 }
