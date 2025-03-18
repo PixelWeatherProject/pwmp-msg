@@ -9,6 +9,9 @@ pub mod response;
 pub mod settings;
 pub mod version;
 
+/// Message ID type.
+pub type MsgId = u32;
+
 /// A Message object.
 /// Can either be a request or a response.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -22,7 +25,7 @@ pub struct Message {
     ///
     /// The server and client should keep a short-term cache of the sent/received IDs
     /// to determinte if the same message hasn't been duplicated.
-    id: u32,
+    id: MsgId,
 
     /// Actual content of the message, which can be either a request or a response.
     content: MessageContent,
@@ -49,7 +52,7 @@ impl Message {
     /// assert_eq!(message.id(), id);
     /// assert_eq!(message.take_request(), Some(request));
     /// ```
-    pub const fn new_request(req: request::Request, id: u32) -> Self {
+    pub const fn new_request(req: request::Request, id: MsgId) -> Self {
         Self {
             id,
             content: MessageContent::Request(req),
@@ -69,7 +72,7 @@ impl Message {
     /// assert_eq!(message.id(), id);
     /// assert_eq!(message.take_response(), Some(response));
     /// ```
-    pub const fn new_response(res: response::Response, id: u32) -> Self {
+    pub const fn new_response(res: response::Response, id: MsgId) -> Self {
         Self {
             id,
             content: MessageContent::Response(res),
@@ -285,7 +288,7 @@ impl Message {
     /// assert_eq!(message.id(), id);
     /// ```
     #[must_use]
-    pub const fn id(&self) -> u32 {
+    pub const fn id(&self) -> MsgId {
         self.id
     }
 }
