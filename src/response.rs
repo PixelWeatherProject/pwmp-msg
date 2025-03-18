@@ -19,6 +19,9 @@ pub enum Response {
     /// Client exceeded the server's rate limit.
     RateLimitExceeded,
 
+    /// An error occurred on the server while processing the request.
+    InternalServerError,
+
     /// No new firmware update is available.
     FirmwareUpToDate,
 
