@@ -13,7 +13,7 @@ generate_test!(can_serialize_ping, Request::Ping);
 
 generate_test!(
     can_serialize_hello,
-    Request::Hello {
+    Request::Handshake {
         mac: Mac::new(0, 1, 2, 3, 4, 5),
     }
 );
