@@ -13,6 +13,12 @@ pub enum Response {
     /// The server has rejected authentication. The node/client will be disconnected.
     Reject,
 
+    /// The client made an invalid request.
+    InvalidRequest,
+
+    /// Client exceeded the server's rate limit.
+    RateLimitExceeded,
+
     /// No new firmware update is available.
     FirmwareUpToDate,
 
