@@ -12,21 +12,51 @@ pub mod version;
 /// A Message object.
 /// Can either be a request or a response.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
-pub enum Message {
-    /// Server requested data from a client or vice-versa.
+pub struct Message {
+    /// Unique ID of this message.
+    ///
+    /// Reliability of the unsigned 32-bit integer ID:
+    /// - If two messages happen to have the same ID, as long as they're sent to two different clients, it's fine.
+    /// - The client and the server won't usually exchange many messages.
+    /// - If the client requests too many OTA update chunks, this might be problematic.
+    ///
+    /// The server and client should keep a short-term cache of the sent/received IDs
+    /// to determinte if the same message hasn't been duplicated.
+    id: u32,
+
+    /// Actual content of the message, which can be either a request or a response.
+    content: MessageContent,
+}
+
+/// A wrapper for the contents of the message.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+enum MessageContent {
     Request(request::Request),
-    /// Server responded to a request from a client or vice-versa.
     Response(response::Response),
 }
 
 impl Message {
+    pub const fn new_request(req: request::Request, id: u32) -> Self {
+        Self {
+            id,
+            content: MessageContent::Request(req),
+        }
+    }
+
+    pub const fn new_response(res: response::Response, id: u32) -> Self {
+        Self {
+            id,
+            content: MessageContent::Response(res),
+        }
+    }
+
     /// Serialize the message into raw bytes.
     ///
     /// # Panics
     /// This will panic if the message could not be serialized.
     #[must_use]
-    pub fn serialize(self) -> Vec<u8> {
-        postcard::to_stdvec(&self).unwrap()
+    pub fn serialize(self) -> Box<[u8]> {
+        postcard::to_stdvec(&self).unwrap().into_boxed_slice()
     }
 
     /// Deserialize a message from raw bytes.
@@ -39,7 +69,7 @@ impl Message {
     /// If the message contains a [`Response`] instead, `None` is returned.
     #[must_use]
     pub const fn request(&self) -> Option<&request::Request> {
-        if let Self::Request(req) = self {
+        if let MessageContent::Request(req) = &self.content {
             Some(req)
         } else {
             None
@@ -50,8 +80,8 @@ impl Message {
     /// If the message contains a [`Request`] instead, `None` is returned.
     #[must_use]
     pub const fn response(&self) -> Option<&response::Response> {
-        if let Self::Response(resp) = self {
-            Some(resp)
+        if let MessageContent::Response(res) = &self.content {
+            Some(res)
         } else {
             None
         }
@@ -59,8 +89,8 @@ impl Message {
 
     /// Similar to [`request()`](Self::request), but consumes the message itself.
     #[must_use]
-    pub fn as_request(self) -> Option<request::Request> {
-        if let Self::Request(req) = self {
+    pub fn take_request(self) -> Option<request::Request> {
+        if let MessageContent::Request(req) = self.content {
             Some(req)
         } else {
             None
@@ -70,29 +100,10 @@ impl Message {
     /// Similar to [`response()`](Self::response), but consumes the message itself.
     #[must_use]
     pub fn as_response(self) -> Option<response::Response> {
-        if let Self::Response(resp) = self {
-            Some(resp)
+        if let MessageContent::Response(res) = self.content {
+            Some(res)
         } else {
             None
         }
-    }
-
-    /// Returns the length of the message if it was serialized.
-    ///
-    /// # Panics
-    /// This will panic if the message could not be serialized.
-    ///
-    /// # Example
-    /// ```rust
-    /// # use pwmp_msg::{Message, response::Response, request::Request};
-    /// let ping = Message::Request(Request::Ping);
-    /// let pong = Message::Response(Response::Pong);
-    ///
-    /// assert_eq!(ping.size(), 2);
-    /// assert_eq!(pong.size(), 2);
-    /// ```
-    #[must_use]
-    pub fn size(&self) -> usize {
-        postcard::to_stdvec(self).unwrap().len()
     }
 }
