@@ -1,4 +1,5 @@
 use crate::{settings::NodeSettings, version::Version};
+use derive_more::Debug;
 use serde::{Deserialize, Serialize};
 
 /// A response message used by the PWMP server to respond to [`Request`](crate::request::Request)s.
@@ -32,7 +33,7 @@ pub enum Response {
     UpdateAvailable(Version),
 
     /// Part of a firmware update.
-    UpdatePart(Box<[u8]>),
+    UpdatePart(#[debug(skip)] Box<[u8]>),
 
     /// End of firmware update chunks.
     UpdateEnd,
