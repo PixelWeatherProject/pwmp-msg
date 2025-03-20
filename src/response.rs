@@ -22,6 +22,9 @@ pub enum Response {
     /// An error occurred on the server while processing the request.
     InternalServerError,
 
+    /// Kicked for stalling.
+    Stalling,
+
     /// No new firmware update is available.
     FirmwareUpToDate,
 
