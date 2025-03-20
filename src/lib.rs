@@ -52,6 +52,7 @@ impl Message {
     /// assert_eq!(message.id(), id);
     /// assert_eq!(message.take_request(), Some(request));
     /// ```
+    #[must_use]
     pub const fn new_request(req: request::Request, id: MsgId) -> Self {
         Self {
             id,
@@ -72,6 +73,7 @@ impl Message {
     /// assert_eq!(message.id(), id);
     /// assert_eq!(message.take_response(), Some(response));
     /// ```
+    #[must_use]
     pub const fn new_response(res: response::Response, id: MsgId) -> Self {
         Self {
             id,
