@@ -165,3 +165,6 @@ The PWMP protocol is designed with the following restrictions:
 - Messages do not have any kind of error-correcting codes.
     - Since PWMP uses TCP, there is already some error-correction happening on a lower level.
     - If a message gets corrupted during transfer, it's very likely that the deserialization would fail anyway.
+
+# Fuzz tests
+You can run the fuzz tests with `cargo +nightly fuzz run [target]`.
