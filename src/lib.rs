@@ -106,7 +106,10 @@ impl Message {
     /// This will panic if the message could not be serialized.
     #[must_use]
     pub fn serialize(self) -> Box<[u8]> {
-        postcard::to_stdvec(&self).unwrap().into_boxed_slice()
+        serde_json::to_string_pretty(&self)
+            .unwrap()
+            .into_bytes()
+            .into_boxed_slice()
     }
 
     /// Deserialize a message from raw bytes.
@@ -139,7 +142,8 @@ impl Message {
     /// ```
     #[must_use]
     pub fn deserialize(bytes: &[u8]) -> Option<Self> {
-        postcard::from_bytes(bytes).ok()
+        let string_repr = std::str::from_utf8(bytes).ok()?;
+        serde_json::from_str(string_repr).ok()?
     }
 
     /// Returns a reference to the contained [`Request`].

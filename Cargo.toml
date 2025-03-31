@@ -14,9 +14,7 @@ repository = "https://github.com/PixelWeatherProject/pwmp-msg"
 derive_more = { version = "2.0.1", default-features = false, features = [
     "debug",
 ] }
-postcard = { version = "1.1.1", default-features = false, features = [
-    "use-std",
-] }
+serde_json = "1.0.140"
 rust_decimal = { version = "1.36.0", default-features = false, features = [
     "std",
     "serde",
