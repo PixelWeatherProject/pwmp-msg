@@ -1,6 +1,6 @@
 [package]
 name = "pwmp-msg"
-version = "2.1.3"
+version = "2.1.4"
 edition = "2021"
 authors = ["Fábián Varga <23280129+br0kenpixel@users.noreply.github.com>"]
 description = "Provides the types representing all messages in the PixelWeather Messaging Protocol."
