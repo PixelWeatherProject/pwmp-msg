@@ -1,5 +1,3 @@
-pub use rust_decimal::Decimal;
-pub use rust_decimal_macros::dec;
 use serde::{Deserialize, Serialize};
 
 pub mod aliases;
@@ -14,7 +12,7 @@ pub type MsgId = u32;
 
 /// A Message object.
 /// Can either be a request or a response.
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Message {
     /// Unique ID of this message.
     ///
@@ -32,7 +30,7 @@ pub struct Message {
 }
 
 /// A wrapper for the contents of the message.
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 enum MessageContent {
     Request(request::Request),
     Response(response::Response),

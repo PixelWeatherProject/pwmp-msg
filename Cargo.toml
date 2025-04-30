@@ -17,10 +17,4 @@ derive_more = { version = "2.0.1", default-features = false, features = [
 postcard = { version = "1.1.1", default-features = false, features = [
     "use-std",
 ] }
-rust_decimal = { version = "1.37.1", default-features = false, features = [
-    "std",
-    "serde",
-    "serde-bincode", # serde-str -> for postcard
-] }
-rust_decimal_macros = { version = "1.37.1", features = ["reexportable"] }
 serde = { version = "1.0.219", features = ["derive"] }

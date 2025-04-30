@@ -1,4 +1,4 @@
-use pwmp_msg::{mac::Mac, request::Request, version::Version, Decimal, Message};
+use pwmp_msg::{mac::Mac, request::Request, version::Version, Message};
 
 macro_rules! generate_test {
     ($test_name: ident, $req: expr) => {
@@ -21,7 +21,7 @@ generate_test!(
 generate_test!(
     can_serialize_post_results,
     Request::PostResults {
-        temperature: Decimal::default(),
+        temperature: f32::default(),
         humidity: 50,
         air_pressure: Some(u16::MAX),
     }
@@ -30,7 +30,7 @@ generate_test!(
 generate_test!(
     can_serialize_post_stats,
     Request::PostStats {
-        battery: Decimal::default(),
+        battery: f32::default(),
         wifi_ssid: "ABC 123".into(),
         wifi_rssi: -15,
     }

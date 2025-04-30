@@ -6,7 +6,7 @@ use crate::{
 use serde::{Deserialize, Serialize};
 
 /// A request message used by nodes to ask the PWMP server to perform an operation.
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub enum Request {
     /// Used to check if the server is alive.
     Ping,
