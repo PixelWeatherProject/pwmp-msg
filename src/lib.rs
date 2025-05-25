@@ -1,3 +1,7 @@
+//! PixelWeather Messaging Protocol core library.
+//!
+//! This library contains the definitions of all possible messages in the PWMP.
+
 use serde::{Deserialize, Serialize};
 
 pub mod aliases;
@@ -32,7 +36,10 @@ pub struct Message {
 /// A wrapper for the contents of the message.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 enum MessageContent {
+    /// Client (node) has requested the server to perform an operation.
     Request(request::Request),
+
+    /// Server has responded to a client's request.
     Response(response::Response),
 }
 

@@ -1,3 +1,5 @@
+//! Contains the definition of a response message, used to respond to requests.
+
 use crate::{settings::NodeSettings, version::Version};
 use derive_more::Debug;
 use serde::{Deserialize, Serialize};

@@ -1,3 +1,6 @@
+//! Contains the definition of a simple version structure for storing
+//! and representing semantic version numbers (`X.Y.Z`).
+
 use serde::{Deserialize, Serialize};
 use std::{fmt::Display, str::FromStr};
 

@@ -1,3 +1,8 @@
+//! MAC Address type.
+//!
+//! Defines a very basic MAC Address data type used for storing and representing
+//! MAC adresses.
+
 use serde::{Deserialize, Serialize};
 use std::{
     fmt::Display,
@@ -6,6 +11,8 @@ use std::{
     str::FromStr,
 };
 
+/// Maximum length of a MAC address when represented as a string of characters
+/// in the following format: `AA:BB:CC:DD:EE:FF`.
 const MAC_STR_LEN: usize = "11:22:33:44:55:66".len();
 
 /// MAC address.

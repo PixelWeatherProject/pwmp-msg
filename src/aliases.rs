@@ -1,3 +1,5 @@
+//! Type aliases.
+
 /// A fixed-precision decimal number that represents temperature in *Celsius*.
 pub type Temperature = f32;
 

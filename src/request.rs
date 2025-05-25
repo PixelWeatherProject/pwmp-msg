@@ -1,3 +1,5 @@
+//! Contains the definition if a request message.
+
 use crate::{
     aliases::{AirPressure, BatteryVoltage, Humidity, Rssi, Temperature},
     mac::Mac,
