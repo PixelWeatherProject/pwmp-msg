@@ -1,6 +1,7 @@
 //! Settings type for representing individual node settings.
 
 use serde::{Deserialize, Serialize};
+use std::time::Duration;
 
 /// Settings of a particular node.
 #[allow(clippy::struct_excessive_bools)]
@@ -20,6 +21,14 @@ pub struct NodeSettings {
 
     /// Whether the node is allowed to send notifications.
     pub mute_notifications: bool,
+}
+
+impl NodeSettings {
+    #[must_use]
+    /// Returns the sleep time represented using [`Duration`](Duration).
+    pub const fn sleep_time(&self) -> Duration {
+        Duration::from_secs(self.sleep_time as _)
+    }
 }
 
 impl Default for NodeSettings {
