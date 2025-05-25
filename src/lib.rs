@@ -1,3 +1,5 @@
+#![deny(missing_docs, clippy::missing_docs_in_private_items)]
+
 //! PixelWeather Messaging Protocol core library.
 //!
 //! This library contains the definitions of all possible messages in the PWMP.
