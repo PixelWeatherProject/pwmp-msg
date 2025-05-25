@@ -21,3 +21,15 @@ pub struct NodeSettings {
     /// Whether the node is allowed to send notifications.
     pub mute_notifications: bool,
 }
+
+impl Default for NodeSettings {
+    fn default() -> Self {
+        Self {
+            battery_ignore: false,
+            ota: true,
+            sleep_time: 60,
+            sbop: true,
+            mute_notifications: false,
+        }
+    }
+}
