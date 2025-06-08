@@ -29,10 +29,20 @@ impl NodeSettings {
     pub const fn sleep_time(&self) -> Duration {
         Duration::from_secs(self.sleep_time as _)
     }
-}
 
-impl Default for NodeSettings {
-    fn default() -> Self {
+    /// Create a new instance with default values.
+    ///
+    /// This is an alternative to [`Default::default()`] that is `const`.
+    /// Useful for creating `static`s without the need for `Lazy*` or `Once*`
+    /// primitives.
+    ///
+    /// ```rust
+    /// use pwmp_msg::settings::NodeSettings;
+    ///
+    /// static SETTINGS: NodeSettings = NodeSettings::const_default();
+    /// ```
+    #[must_use]
+    pub const fn const_default() -> Self {
         Self {
             battery_ignore: false,
             ota: true,
@@ -40,5 +50,11 @@ impl Default for NodeSettings {
             sbop: true,
             mute_notifications: false,
         }
+    }
+}
+
+impl Default for NodeSettings {
+    fn default() -> Self {
+        Self::const_default()
     }
 }
