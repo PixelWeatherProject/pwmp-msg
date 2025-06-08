@@ -24,8 +24,18 @@ pub struct NodeSettings {
 }
 
 impl NodeSettings {
-    #[must_use]
     /// Returns the sleep time represented using [`Duration`](Duration).
+    ///
+    /// ```rust
+    /// use pwmp_msg::settings::NodeSettings;
+    /// use std::time::Duration;
+    ///
+    /// let mut settings = NodeSettings::default();
+    /// settings.sleep_time = 555;
+    ///
+    /// assert_eq!(settings.sleep_time(), Duration::from_secs(555));
+    /// ```
+    #[must_use]
     pub const fn sleep_time(&self) -> Duration {
         Duration::from_secs(self.sleep_time as _)
     }
