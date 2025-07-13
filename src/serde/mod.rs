@@ -3,6 +3,7 @@
 use super::{request::Request, response::Response, Message, MessageContent};
 
 mod consts;
+mod utils;
 
 /// Serialize a message.
 pub fn serialize(msg: Message) -> Box<[u8]> {
@@ -43,7 +44,7 @@ fn serialize_request(req: Request, buffer: &mut Vec<u8>) {
             buffer.extend_from_slice(&temperature.to_ne_bytes());
             buffer.push(humidity);
 
-            serialize_optional(
+            utils::serialize_optional(
                 air_pressure,
                 |val, buffer| {
                     buffer.extend_from_slice(&val.to_ne_bytes());
@@ -57,11 +58,11 @@ fn serialize_request(req: Request, buffer: &mut Vec<u8>) {
             wifi_rssi,
         } => {
             buffer.extend_from_slice(&battery.to_ne_bytes());
-            serialize_blob(wifi_ssid.as_bytes(), buffer);
+            utils::serialize_blob(wifi_ssid.as_bytes(), buffer);
             buffer.extend_from_slice(&wifi_rssi.to_ne_bytes());
         }
         Request::SendNotification(content) => {
-            serialize_blob(content.as_bytes(), buffer);
+            utils::serialize_blob(content.as_bytes(), buffer);
         }
         Request::GetSettings => {
             buffer.push(1); // second variant with empty values
@@ -126,7 +127,7 @@ fn serialize_response(res: Response, buffer: &mut Vec<u8>) {
             buffer.push(8);
         }
         Response::Settings(settings) => {
-            serialize_optional(
+            utils::serialize_optional(
                 settings,
                 |val, buffer| {
                     buffer.push(u8::from(val.battery_ignore));
@@ -138,29 +139,6 @@ fn serialize_response(res: Response, buffer: &mut Vec<u8>) {
                 },
                 buffer,
             );
-        }
-    }
-}
-
-/// Serialize a blob.
-fn serialize_blob(val: &[u8], buffer: &mut Vec<u8>) {
-    buffer.reserve(size_of::<usize>() + val.len());
-    buffer.extend_from_slice(&val.len().to_ne_bytes());
-    buffer.extend_from_slice(val);
-}
-
-/// Serialize an optinal.
-fn serialize_optional<T, F>(val: Option<T>, value_serializer: F, buffer: &mut Vec<u8>)
-where
-    F: FnOnce(T, &mut Vec<u8>),
-{
-    match val {
-        Some(inner) => {
-            buffer.push(consts::OPTIONAL_EXIST);
-            value_serializer(inner, buffer);
-        }
-        None => {
-            buffer.push(consts::OPTIONAL_EMPTY);
         }
     }
 }
