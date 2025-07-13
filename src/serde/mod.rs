@@ -43,15 +43,13 @@ fn serialize_request(req: Request, buffer: &mut Vec<u8>) {
             buffer.extend_from_slice(&temperature.to_ne_bytes());
             buffer.push(humidity);
 
-            match air_pressure {
-                Some(val) => {
-                    buffer.push(consts::OPTIONAL_EXIST);
+            serialize_optional(
+                air_pressure,
+                |val, buffer| {
                     buffer.extend_from_slice(&val.to_ne_bytes());
-                }
-                None => {
-                    buffer.push(consts::OPTIONAL_EMPTY);
-                }
-            }
+                },
+                buffer,
+            );
         }
         Request::PostStats {
             battery,
@@ -127,21 +125,20 @@ fn serialize_response(res: Response, buffer: &mut Vec<u8>) {
         Response::UpdateEnd => {
             buffer.push(8);
         }
-        Response::Settings(settings) => match settings {
-            Some(val) => {
-                buffer.reserve(8 /* 1x u8 + 5x bool + 1x u16 */); // prevent multiple allocations here
-                buffer.push(consts::OPTIONAL_EXIST);
-                buffer.push(u8::from(val.battery_ignore));
-                buffer.push(u8::from(val.ota));
-                buffer.extend_from_slice(&val.sleep_time.to_ne_bytes());
-                buffer.push(u8::from(val.sbop));
-                buffer.push(u8::from(val.sbop));
-                buffer.push(u8::from(val.mute_notifications));
-            }
-            None => {
-                buffer.push(consts::OPTIONAL_EMPTY);
-            }
-        },
+        Response::Settings(settings) => {
+            serialize_optional(
+                settings,
+                |val, buffer| {
+                    buffer.push(u8::from(val.battery_ignore));
+                    buffer.push(u8::from(val.ota));
+                    buffer.extend_from_slice(&val.sleep_time.to_ne_bytes());
+                    buffer.push(u8::from(val.sbop));
+                    buffer.push(u8::from(val.sbop));
+                    buffer.push(u8::from(val.mute_notifications));
+                },
+                buffer,
+            );
+        }
     }
 }
 
@@ -150,6 +147,22 @@ fn serialize_blob(val: &[u8], buffer: &mut Vec<u8>) {
     buffer.reserve(size_of::<usize>() + val.len());
     buffer.extend_from_slice(&val.len().to_ne_bytes());
     buffer.extend_from_slice(val);
+}
+
+/// Serialize an optinal.
+fn serialize_optional<T, F>(val: Option<T>, value_serializer: F, buffer: &mut Vec<u8>)
+where
+    F: FnOnce(T, &mut Vec<u8>),
+{
+    match val {
+        Some(inner) => {
+            buffer.push(consts::OPTIONAL_EXIST);
+            value_serializer(inner, buffer);
+        }
+        None => {
+            buffer.push(consts::OPTIONAL_EMPTY);
+        }
+    }
 }
 
 /// Deserialize a message.
