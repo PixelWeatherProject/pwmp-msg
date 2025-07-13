@@ -42,3 +42,23 @@ pub enum Response {
     /// Node settings.
     Settings(Option<NodeSettings>),
 }
+
+impl Response {
+    /// Return the type ID.
+    pub(crate) const fn type_id(&self) -> u8 {
+        match self {
+            Self::Pong => 0,
+            Self::Ok => 1,
+            Self::Reject => 2,
+            Self::InvalidRequest => 3,
+            Self::RateLimitExceeded => 4,
+            Self::InternalServerError => 5,
+            Self::Stalling => 6,
+            Self::FirmwareUpToDate => 7,
+            Self::UpdateAvailable(..) => 8,
+            Self::UpdatePart(..) => 9,
+            Self::UpdateEnd => 10,
+            Self::Settings(..) => 11,
+        }
+    }
+}

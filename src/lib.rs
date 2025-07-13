@@ -8,6 +8,7 @@ pub mod aliases;
 pub mod mac;
 pub mod request;
 pub mod response;
+mod serde;
 pub mod settings;
 pub mod version;
 
@@ -111,7 +112,7 @@ impl Message {
     /// This will panic if the message could not be serialized.
     #[must_use]
     pub fn serialize(self) -> Box<[u8]> {
-        unimplemented!()
+        serde::serialize(self)
     }
 
     /// Deserialize a message from raw bytes.
@@ -143,8 +144,8 @@ impl Message {
     /// assert_eq!(message, original_message);
     /// ```
     #[must_use]
-    pub fn deserialize(_bytes: &[u8]) -> Option<Self> {
-        unimplemented!()
+    pub fn deserialize(bytes: &[u8]) -> Option<Self> {
+        serde::deserialize(bytes)
     }
 
     /// Returns a reference to the contained [`Request`].
@@ -297,5 +298,14 @@ impl Message {
     #[must_use]
     pub const fn id(&self) -> MsgId {
         self.id
+    }
+
+    /// Return the type ID.
+    #[must_use]
+    pub const fn type_id(&self) -> u8 {
+        match self.content {
+            MessageContent::Request(..) => 0,
+            MessageContent::Response(..) => 1,
+        }
     }
 }

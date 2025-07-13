@@ -64,3 +64,21 @@ pub enum Request {
     /// Tell the server that the session is over and the node will disconnect.
     Bye,
 }
+
+impl Request {
+    /// Return the type ID.
+    pub(crate) const fn type_id(&self) -> u8 {
+        match self {
+            Self::Ping => 0,
+            Self::Handshake { .. } => 1,
+            Self::PostResults { .. } => 2,
+            Self::PostStats { .. } => 3,
+            Self::SendNotification(..) => 4,
+            Self::GetSettings => 5,
+            Self::UpdateCheck(..) => 6,
+            Self::NextUpdateChunk(..) => 7,
+            Self::ReportFirmwareUpdate(..) => 8,
+            Self::Bye => 9,
+        }
+    }
+}
