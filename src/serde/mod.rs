@@ -8,9 +8,6 @@ mod consts;
 pub fn serialize(msg: Message) -> Box<[u8]> {
     let mut buffer = Vec::with_capacity(128);
 
-    // push the magic start
-    buffer.push(consts::MAGIC_START_BYTE);
-
     // push the message type (req/res)
     buffer.push(msg.type_id());
 
@@ -22,9 +19,6 @@ pub fn serialize(msg: Message) -> Box<[u8]> {
             serialize_response(res, &mut buffer);
         }
     }
-
-    // push the magic end
-    buffer.push(consts::MAGIC_END_BYTE);
 
     // end
     buffer.into_boxed_slice()
