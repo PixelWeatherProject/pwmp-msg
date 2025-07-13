@@ -4,8 +4,6 @@
 //!
 //! This library contains the definitions of all possible messages in the PWMP.
 
-use serde::{Deserialize, Serialize};
-
 pub mod aliases;
 pub mod mac;
 pub mod request;
@@ -18,7 +16,7 @@ pub type MsgId = u32;
 
 /// A Message object.
 /// Can either be a request or a response.
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Message {
     /// Unique ID of this message.
     ///
@@ -36,7 +34,7 @@ pub struct Message {
 }
 
 /// A wrapper for the contents of the message.
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 enum MessageContent {
     /// Client (node) has requested the server to perform an operation.
     Request(request::Request),
@@ -113,7 +111,7 @@ impl Message {
     /// This will panic if the message could not be serialized.
     #[must_use]
     pub fn serialize(self) -> Box<[u8]> {
-        postcard::to_stdvec(&self).unwrap().into_boxed_slice()
+        unimplemented!()
     }
 
     /// Deserialize a message from raw bytes.
@@ -145,8 +143,8 @@ impl Message {
     /// assert_eq!(message, original_message);
     /// ```
     #[must_use]
-    pub fn deserialize(bytes: &[u8]) -> Option<Self> {
-        postcard::from_bytes(bytes).ok()
+    pub fn deserialize(_bytes: &[u8]) -> Option<Self> {
+        unimplemented!()
     }
 
     /// Returns a reference to the contained [`Request`].

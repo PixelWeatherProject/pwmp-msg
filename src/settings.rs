@@ -1,11 +1,10 @@
 //! Settings type for representing individual node settings.
 
-use serde::{Deserialize, Serialize};
 use std::time::Duration;
 
 /// Settings of a particular node.
 #[allow(clippy::struct_excessive_bools)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct NodeSettings {
     /// Whether to ignore low battery voltage.
     pub battery_ignore: bool,

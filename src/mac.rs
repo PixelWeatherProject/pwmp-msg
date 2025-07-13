@@ -3,7 +3,6 @@
 //! Defines a very basic MAC Address data type used for storing and representing
 //! MAC adresses.
 
-use serde::{Deserialize, Serialize};
 use std::{
     fmt::Display,
     num::ParseIntError,
@@ -16,7 +15,7 @@ use std::{
 const MAC_STR_LEN: usize = "11:22:33:44:55:66".len();
 
 /// MAC address.
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Mac(u8, u8, u8, u8, u8, u8);
 
 /// MAC address parse error.

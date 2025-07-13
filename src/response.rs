@@ -2,10 +2,9 @@
 
 use crate::{settings::NodeSettings, version::Version};
 use derive_more::Debug;
-use serde::{Deserialize, Serialize};
 
 /// A response message used by the PWMP server to respond to [`Request`](crate::request::Request)s.
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Response {
     /// A response message to [`Request::Ping`](crate::request::Request::Ping).
     Pong,

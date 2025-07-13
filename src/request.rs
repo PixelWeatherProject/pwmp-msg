@@ -5,10 +5,9 @@ use crate::{
     mac::Mac,
     version::Version,
 };
-use serde::{Deserialize, Serialize};
 
 /// A request message used by nodes to ask the PWMP server to perform an operation.
-#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Request {
     /// Used to check if the server is alive.
     Ping,
