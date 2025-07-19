@@ -304,8 +304,8 @@ impl Message {
     #[must_use]
     pub const fn type_id(&self) -> u8 {
         match self.content {
-            MessageContent::Request(..) => 0,
-            MessageContent::Response(..) => 1,
+            MessageContent::Request(..) => serde::consts::MSG_KIND_REQUEST,
+            MessageContent::Response(..) => serde::consts::MSG_KIND_RESPONSE,
         }
     }
 }

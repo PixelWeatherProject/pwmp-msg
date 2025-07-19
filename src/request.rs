@@ -69,16 +69,16 @@ impl Request {
     /// Return the type ID.
     pub(crate) const fn type_id(&self) -> u8 {
         match self {
-            Self::Ping => 0,
-            Self::Handshake { .. } => 1,
-            Self::PostResults { .. } => 2,
-            Self::PostStats { .. } => 3,
-            Self::SendNotification(..) => 4,
-            Self::GetSettings => 5,
-            Self::UpdateCheck(..) => 6,
-            Self::NextUpdateChunk(..) => 7,
-            Self::ReportFirmwareUpdate(..) => 8,
-            Self::Bye => 9,
+            Self::Ping => crate::serde::consts::REQ_KIND_PING,
+            Self::Handshake { .. } => crate::serde::consts::REQ_KIND_HANDSHAKE,
+            Self::PostResults { .. } => crate::serde::consts::REQ_KIND_POST_RESULTS,
+            Self::PostStats { .. } => crate::serde::consts::REQ_KIND_POST_STATS,
+            Self::SendNotification(..) => crate::serde::consts::REQ_KIND_SEND_NOTIFICATION,
+            Self::GetSettings => crate::serde::consts::REQ_KIND_GET_SETTINGS,
+            Self::UpdateCheck(..) => crate::serde::consts::REQ_KIND_UPDATE_CHECK,
+            Self::NextUpdateChunk(..) => crate::serde::consts::REQ_KIND_NEXT_UPDATE_CHUNK,
+            Self::ReportFirmwareUpdate(..) => crate::serde::consts::REQ_KIND_REPORT_FWU,
+            Self::Bye => crate::serde::consts::REQ_KIND_BYE,
         }
     }
 }
