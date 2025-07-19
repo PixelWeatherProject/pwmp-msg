@@ -1,9 +1,11 @@
 //! A Serialization and deserialization implementation for PWMP.
 
 use super::{request::Request, response::Response, Message, MessageContent};
-use crate::{aliases::AirPressure, mac::Mac, settings::NodeSettings, MsgId};
+use crate::{mac::Mac, serde::utils::next_byte, settings::NodeSettings, MsgId};
+use error::Deserialize as DeserializeError;
 
 pub mod consts;
+pub mod error;
 mod utils;
 
 /// Serialize a message.
@@ -148,113 +150,103 @@ fn serialize_response(res: Response, buffer: &mut Vec<u8>) {
 }
 
 /// Deserialize a request.
-pub fn deserialize_request(bytes: &[u8]) -> Option<Request> {
+pub fn deserialize_request(bytes: &[u8]) -> Result<Request, DeserializeError> {
     let mut bytes = bytes.iter().copied();
 
     // get the request type
-    let req_type = bytes.next()?;
+    let req_type = utils::next_byte(&mut bytes)?;
 
     match req_type {
-        consts::REQ_KIND_PING => Some(Request::Ping),
+        consts::REQ_KIND_PING => Ok(Request::Ping),
         consts::REQ_KIND_HANDSHAKE => {
+            let octets = utils::next_bytes::<6>(&mut bytes)?;
             let mac = Mac::new(
-                bytes.next()?,
-                bytes.next()?,
-                bytes.next()?,
-                bytes.next()?,
-                bytes.next()?,
-                bytes.next()?,
+                octets[0], octets[1], octets[2], octets[3], octets[4], octets[5],
             );
 
-            Some(Request::Handshake { mac })
+            Ok(Request::Handshake { mac })
         }
         consts::REQ_KIND_POST_RESULTS => {
-            let temperature_bytes = std::array::from_fn(|_| bytes.next().unwrap());
-            let temperature = f32::from_ne_bytes(temperature_bytes);
-            let humidity = bytes.next()?;
-            let air_pressure = if bytes.next()? == 0 {
-                None
-            } else {
-                let air_pressure_bytes = std::array::from_fn(|_| bytes.next().unwrap());
-                Some(AirPressure::from_ne_bytes(air_pressure_bytes))
-            };
+            let temperature = utils::deserialize_f32(&mut bytes)?;
+            let humidity = utils::next_byte(&mut bytes)?;
+            let air_pressure = utils::deserialize_optional(&mut bytes, utils::deserialize_u16)?;
 
-            Some(Request::PostResults {
+            Ok(Request::PostResults {
                 temperature,
                 humidity,
                 air_pressure,
             })
         }
         consts::REQ_KIND_POST_STATS => {
-            let battery = utils::deserialize_f32(&mut bytes);
-            let wifi_ssid = utils::deserialize_string(&mut bytes);
-            let wifi_rssi = utils::deserialize_i8(&mut bytes);
+            let battery = utils::deserialize_f32(&mut bytes)?;
+            let wifi_ssid = utils::deserialize_string(&mut bytes)?;
+            let wifi_rssi = utils::deserialize_i8(&mut bytes)?;
 
-            Some(Request::PostStats {
+            Ok(Request::PostStats {
                 battery,
                 wifi_ssid,
                 wifi_rssi,
             })
         }
         consts::REQ_KIND_SEND_NOTIFICATION => {
-            let content = utils::deserialize_string(&mut bytes);
-            Some(Request::SendNotification(content))
+            let content = utils::deserialize_string(&mut bytes)?;
+            Ok(Request::SendNotification(content))
         }
-        consts::REQ_KIND_GET_SETTINGS => Some(Request::GetSettings),
+        consts::REQ_KIND_GET_SETTINGS => Ok(Request::GetSettings),
         consts::REQ_KIND_UPDATE_CHECK => {
-            let version = utils::deserialize_version(&mut bytes);
-            Some(Request::UpdateCheck(version))
+            let version = utils::deserialize_version(&mut bytes)?;
+            Ok(Request::UpdateCheck(version))
         }
         consts::REQ_KIND_NEXT_UPDATE_CHUNK => {
-            let amount = utils::deserialize_usize(&mut bytes);
-            Some(Request::NextUpdateChunk(amount))
+            let amount = utils::deserialize_usize(&mut bytes)?;
+            Ok(Request::NextUpdateChunk(amount))
         }
         consts::REQ_KIND_REPORT_FWU => {
-            let success = utils::deserialize_bool(&mut bytes);
-            Some(Request::ReportFirmwareUpdate(success))
+            let success = utils::deserialize_bool(&mut bytes)?;
+            Ok(Request::ReportFirmwareUpdate(success))
         }
-        consts::REQ_KIND_BYE => Some(Request::Bye),
-        _ => None,
+        consts::REQ_KIND_BYE => Ok(Request::Bye),
+        _ => Err(DeserializeError::IllegalRequestType(req_type)),
     }
 }
 
 /// Deserialize a response.
-pub fn deserialize_response(bytes: &[u8]) -> Option<Response> {
+pub fn deserialize_response(bytes: &[u8]) -> Result<Response, DeserializeError> {
     let mut bytes = bytes.iter().copied();
 
     // get the response type
-    let req_type = bytes.next()?;
+    let res_type = next_byte(&mut bytes)?;
 
-    match req_type {
-        consts::RES_KIND_PONG => Some(Response::Pong),
-        consts::RES_KIND_OK => Some(Response::Ok),
-        consts::RES_KIND_REJECT => Some(Response::Reject),
-        consts::RES_KIND_INVALID_REQ => Some(Response::InvalidRequest),
-        consts::RES_KIND_RLE => Some(Response::RateLimitExceeded),
-        consts::RES_KIND_ISE => Some(Response::InternalServerError),
-        consts::RES_KIND_STALLING => Some(Response::Stalling),
-        consts::RES_KIND_FW_UTD => Some(Response::FirmwareUpToDate),
+    match res_type {
+        consts::RES_KIND_PONG => Ok(Response::Pong),
+        consts::RES_KIND_OK => Ok(Response::Ok),
+        consts::RES_KIND_REJECT => Ok(Response::Reject),
+        consts::RES_KIND_INVALID_REQ => Ok(Response::InvalidRequest),
+        consts::RES_KIND_RLE => Ok(Response::RateLimitExceeded),
+        consts::RES_KIND_ISE => Ok(Response::InternalServerError),
+        consts::RES_KIND_STALLING => Ok(Response::Stalling),
+        consts::RES_KIND_FW_UTD => Ok(Response::FirmwareUpToDate),
         consts::RES_KIND_FW_UAVAIL => {
-            let version = utils::deserialize_version(&mut bytes);
-            Some(Response::UpdateAvailable(version))
+            let version = utils::deserialize_version(&mut bytes)?;
+            Ok(Response::UpdateAvailable(version))
         }
         consts::RES_KIND_FW_UPART => {
-            let blob = utils::deserialize_blob(&mut bytes);
-            Some(Response::UpdatePart(blob.into_boxed_slice()))
+            let blob = utils::deserialize_blob(&mut bytes)?;
+            Ok(Response::UpdatePart(blob))
         }
-        consts::RES_KIND_FW_UEND => Some(Response::UpdateEnd),
+        consts::RES_KIND_FW_UEND => Ok(Response::UpdateEnd),
         consts::RES_KIND_SETTINGS => {
             if bytes.next().unwrap_or_default() == 0 {
-                return Some(Response::Settings(None));
+                return Ok(Response::Settings(None));
             }
 
-            let battery_ignore = utils::deserialize_bool(&mut bytes);
-            let ota = utils::deserialize_bool(&mut bytes);
-            let sleep_time = utils::deserialize_u16(&mut bytes);
-            let sbop = utils::deserialize_bool(&mut bytes);
-            let mute_notifications = utils::deserialize_bool(&mut bytes);
+            let battery_ignore = utils::deserialize_bool(&mut bytes)?;
+            let ota = utils::deserialize_bool(&mut bytes)?;
+            let sleep_time = utils::deserialize_u16(&mut bytes)?;
+            let sbop = utils::deserialize_bool(&mut bytes)?;
+            let mute_notifications = utils::deserialize_bool(&mut bytes)?;
 
-            Some(Response::Settings(Some(NodeSettings {
+            Ok(Response::Settings(Some(NodeSettings {
                 battery_ignore,
                 ota,
                 sleep_time,
@@ -262,12 +254,12 @@ pub fn deserialize_response(bytes: &[u8]) -> Option<Response> {
                 mute_notifications,
             })))
         }
-        _ => None,
+        _ => Err(DeserializeError::IllegalResponseType(res_type)),
     }
 }
 
 /// Deserialize a message.
-pub fn deserialize(bytes: &[u8]) -> Option<Message> {
+pub fn deserialize(bytes: &[u8]) -> Result<Message, DeserializeError> {
     // get the message ID
     let msg_id = MsgId::from_ne_bytes(bytes[..4].try_into().unwrap());
 
@@ -277,12 +269,12 @@ pub fn deserialize(bytes: &[u8]) -> Option<Message> {
     match msg_type {
         consts::MSG_KIND_REQUEST => {
             let req = deserialize_request(&bytes[1..])?;
-            Some(Message::new_request(req, msg_id))
+            Ok(Message::new_request(req, msg_id))
         }
         consts::MSG_KIND_RESPONSE => {
             let res = deserialize_response(&bytes[1..])?;
-            Some(Message::new_response(res, msg_id))
+            Ok(Message::new_response(res, msg_id))
         }
-        _ => None,
+        _ => Err(DeserializeError::IllegalMessageType(msg_type)),
     }
 }

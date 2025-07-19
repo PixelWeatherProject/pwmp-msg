@@ -12,6 +12,7 @@ repository = "https://github.com/PixelWeatherProject/pwmp-msg"
 
 [dependencies]
 byteorder = { version = "1.5.0", default-features = false }
+thiserror = { version = "2.0.12", default-features = false }
 derive_more = { version = "2.0.1", default-features = false, features = [
     "debug",
 ] }

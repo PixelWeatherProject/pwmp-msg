@@ -143,8 +143,7 @@ impl Message {
     ///
     /// assert_eq!(message, original_message);
     /// ```
-    #[must_use]
-    pub fn deserialize(bytes: &[u8]) -> Option<Self> {
+    pub fn deserialize(bytes: &[u8]) -> Result<Self, serde::error::Deserialize> {
         serde::deserialize(bytes)
     }
 
