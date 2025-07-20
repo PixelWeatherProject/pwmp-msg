@@ -11,7 +11,10 @@ macro_rules! bb {
 macro_rules! generate_benchmark {
     ($name: ident, $string_name: literal, $msg: expr) => {
         fn $name(c: &mut Criterion) {
-            c.bench_function($string_name, |b| b.iter(|| Message::serialize(bb!($msg))));
+            let mut buffer = Vec::with_capacity(128);
+            c.bench_function($string_name, |b| {
+                b.iter(|| Message::serialize_into(bb!($msg), &mut buffer))
+            });
         }
     };
 }
@@ -110,14 +113,11 @@ generate_benchmark!(
 criterion_group!(
     benches,
     benchmark_request_ping_serialization,
-    benchmark_request_ping_serialization,
     benchmark_request_handshake_serialization,
     benchmark_request_post_results_serialization,
     benchmark_request_post_stats_serialization,
     benchmark_request_send_notification_serialization,
     benchmark_request_get_settings_serialization,
-    benchmark_request_update_check_serialization,
-    benchmark_request_send_notification_serialization,
     benchmark_request_update_check_serialization,
     benchmark_request_next_update_chunk_serialization,
     benchmark_request_report_fw_update_serialization,
