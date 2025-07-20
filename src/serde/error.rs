@@ -38,4 +38,8 @@ pub enum Deserialize {
     /// Invalid UTF-8 string.
     #[error("Failed to validate UTF-8 string sequence: '{0}'.")]
     IllegalUtf8String(#[from] std::string::FromUtf8Error),
+
+    /// The buffer should be empty, but it still contains extra unprocessed and unnecessary data.
+    #[error("Expected buffer to be empty, but it still has {0} more bytes")]
+    ExtraDataLeft(usize),
 }

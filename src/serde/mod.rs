@@ -267,7 +267,7 @@ pub fn deserialize(bytes: &[u8]) -> Result<Message, DeserializeError> {
     // get the message type (req/res)
     let msg_type = utils::next_byte(&mut bytes)?;
 
-    match msg_type {
+    let message = match msg_type {
         consts::MSG_KIND_REQUEST => {
             let req = deserialize_request(&mut bytes)?;
             Ok(Message::new_request(req, msg_id))
@@ -277,5 +277,14 @@ pub fn deserialize(bytes: &[u8]) -> Result<Message, DeserializeError> {
             Ok(Message::new_response(res, msg_id))
         }
         _ => Err(DeserializeError::IllegalMessageType(msg_type)),
+    }?;
+
+    // at this point we should have processed every byte in the array
+    // there should be no more bytes returned by the iterator, otherwise we throw an error
+    let leftover = bytes.count();
+    if leftover != 0 {
+        return Err(DeserializeError::ExtraDataLeft(leftover));
     }
+
+    Ok(message)
 }
