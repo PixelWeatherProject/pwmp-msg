@@ -2,110 +2,110 @@ use criterion::{criterion_group, criterion_main, Criterion};
 use pwmp_msg::{mac::Mac, request::Request, version::Version, Message};
 use std::hint::black_box;
 
-fn benchmark_request_ping_serialization(c: &mut Criterion) {
-    c.bench_function("Message(Request::Ping)::serialize", |b| {
-        b.iter(|| Message::serialize(black_box(Message::new_request(Request::Ping, 88))))
-    });
+macro_rules! bb {
+    ($e: expr) => {
+        black_box($e)
+    };
 }
 
-fn benchmark_request_handshake_serialization(c: &mut Criterion) {
-    c.bench_function("Message(Request::Handshake)::serialize", |b| {
-        b.iter(|| {
-            Message::serialize(black_box(Message::new_request(
-                Request::Handshake {
-                    mac: Mac::new(0, 1, 2, 3, 4, 5),
-                },
-                47,
-            )))
-        })
-    });
+macro_rules! generate_benchmark {
+    ($name: ident, $string_name: literal, $msg: expr) => {
+        fn $name(c: &mut Criterion) {
+            c.bench_function($string_name, |b| b.iter(|| Message::serialize(bb!($msg))));
+        }
+    };
 }
 
-fn benchmark_request_post_results_serialization(c: &mut Criterion) {
-    c.bench_function("Message(Request::PostResults)::serialize", |b| {
-        b.iter(|| {
-            Message::serialize(black_box(Message::new_request(
-                Request::PostResults {
-                    temperature: 45.78,
-                    humidity: 45,
-                    air_pressure: Some(65520),
-                },
-                88,
-            )))
-        })
-    });
-}
+generate_benchmark!(
+    benchmark_request_ping_serialization,
+    "Message(Request::Ping)::serialize",
+    Message::new_request(bb!(Request::Ping), bb!(55))
+);
 
-fn benchmark_request_post_stats_serialization(c: &mut Criterion) {
-    c.bench_function("Message(Request::PostStats)::serialize", |b| {
-        b.iter(|| {
-            Message::serialize(black_box(Message::new_request(
-                Request::PostStats {
-                    battery: 4.20,
-                    wifi_ssid: "Hello, World!".to_string().into_boxed_str(),
-                    wifi_rssi: -45,
-                },
-                64,
-            )))
-        })
-    });
-}
+generate_benchmark!(
+    benchmark_request_handshake_serialization,
+    "Message(Request::Handshake)::serialize",
+    Message::new_request(
+        bb!(Request::Handshake {
+            mac: bb!(Mac::new(bb!(0), bb!(1), bb!(2), bb!(3), bb!(4), bb!(5)))
+        }),
+        bb!(55)
+    )
+);
 
-fn benchmark_request_send_notification_serialization(c: &mut Criterion) {
-    c.bench_function("Message(Request::SendNotification)::serialize", |b| {
-        b.iter(|| {
-            Message::serialize(black_box(Message::new_request(
-                Request::SendNotification("Hello, World!".to_string().into_boxed_str()),
-                88,
-            )))
-        })
-    });
-}
+generate_benchmark!(
+    benchmark_request_post_results_serialization,
+    "Message(Request::PostResults)::serialize",
+    Message::new_request(
+        bb!(Request::PostResults {
+            temperature: bb!(45.78),
+            humidity: bb!(45),
+            air_pressure: bb!(Some(bb!(65520))),
+        }),
+        bb!(55)
+    )
+);
 
-fn benchmark_request_get_settings_serialization(c: &mut Criterion) {
-    c.bench_function("Message(Request::GetSettings)::serialize", |b| {
-        b.iter(|| Message::serialize(black_box(Message::new_request(Request::GetSettings, 88))))
-    });
-}
+generate_benchmark!(
+    benchmark_request_post_stats_serialization,
+    "Message(Request::PostStats)::serialize",
+    Message::new_request(
+        bb!(Request::PostStats {
+            battery: bb!(4.20),
+            wifi_ssid: bb!("Hello, World!".to_string().into_boxed_str()),
+            wifi_rssi: bb!(-45),
+        }),
+        bb!(55)
+    )
+);
 
-fn benchmark_request_update_check_serialization(c: &mut Criterion) {
-    c.bench_function("Message(Request::UpdateCheck)::serialize", |b| {
-        b.iter(|| {
-            Message::serialize(black_box(Message::new_request(
-                Request::UpdateCheck(Version::new(5, 4, 7)),
-                88,
-            )))
-        })
-    });
-}
+generate_benchmark!(
+    benchmark_request_send_notification_serialization,
+    "Message(Request::SendNotification)::serialize",
+    Message::new_request(
+        bb!(Request::SendNotification(bb!("Hello, World!"
+            .to_string()
+            .into_boxed_str()))),
+        bb!(55)
+    )
+);
 
-fn benchmark_request_next_update_chunk_serialization(c: &mut Criterion) {
-    c.bench_function("Message(Request::NextUpdateChunk)::serialize", |b| {
-        b.iter(|| {
-            Message::serialize(black_box(Message::new_request(
-                Request::NextUpdateChunk(128_000_000),
-                88,
-            )))
-        })
-    });
-}
+generate_benchmark!(
+    benchmark_request_get_settings_serialization,
+    "Message(Request::GetSettings)::serialize",
+    Message::new_request(bb!(Request::GetSettings), bb!(55))
+);
 
-fn benchmark_request_report_fw_update_serialization(c: &mut Criterion) {
-    c.bench_function("Message(Request::ReportFirmwareUpdate)::serialize", |b| {
-        b.iter(|| {
-            Message::serialize(black_box(Message::new_request(
-                Request::ReportFirmwareUpdate(true),
-                88,
-            )))
-        })
-    });
-}
+generate_benchmark!(
+    benchmark_request_update_check_serialization,
+    "Message(Request::UpdateCheck)::serialize",
+    Message::new_request(
+        bb!(Request::UpdateCheck(bb!(Version::new(
+            bb!(5),
+            bb!(4),
+            bb!(7)
+        )))),
+        bb!(55)
+    )
+);
 
-fn benchmark_request_bye_serialization(c: &mut Criterion) {
-    c.bench_function("Message(Request::Bye)::serialize", |b| {
-        b.iter(|| Message::serialize(black_box(Message::new_request(Request::Bye, 88))))
-    });
-}
+generate_benchmark!(
+    benchmark_request_next_update_chunk_serialization,
+    "Message(Request::NextUpdateChunk)::serialize",
+    Message::new_request(bb!(Request::NextUpdateChunk(bb!(128_000_000))), bb!(55))
+);
+
+generate_benchmark!(
+    benchmark_request_report_fw_update_serialization,
+    "Message(Request::ReportFirmwareUpdate)::serialize",
+    Message::new_request(bb!(Request::ReportFirmwareUpdate(bb!(true))), bb!(55))
+);
+
+generate_benchmark!(
+    benchmark_request_bye_serialization,
+    "Message(Request::Bye)::serialize",
+    Message::new_request(bb!(Request::Bye), bb!(55))
+);
 
 criterion_group!(
     benches,
