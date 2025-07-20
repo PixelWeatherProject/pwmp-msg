@@ -76,6 +76,12 @@ impl Display for Mac {
     }
 }
 
+impl From<[u8; 6]> for Mac {
+    fn from(value: [u8; 6]) -> Self {
+        Self::new(value[0], value[1], value[2], value[3], value[4], value[5])
+    }
+}
+
 impl Index<usize> for Mac {
     type Output = u8;
 
