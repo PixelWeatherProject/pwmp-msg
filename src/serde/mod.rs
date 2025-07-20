@@ -107,7 +107,7 @@ fn serialize_response(res: Response, buffer: &mut Vec<u8>) {
             buffer.push(new_version.minor());
         }
         Response::UpdatePart(blob) => {
-            buffer.extend_from_slice(&blob);
+            utils::serialize_blob(&blob, buffer);
         }
         Response::UpdateEnd => {}
         Response::Settings(settings) => {
