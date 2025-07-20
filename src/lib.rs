@@ -143,6 +143,9 @@ impl Message {
     ///
     /// assert_eq!(message, original_message);
     /// ```
+    ///
+    /// # Errors
+    /// An error is returned if the deserialization process fails.
     pub fn deserialize(bytes: &[u8]) -> Result<Self, serde::error::Deserialize> {
         serde::deserialize(bytes)
     }
