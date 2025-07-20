@@ -87,6 +87,12 @@ pub fn deserialize_usize(bytes: &mut impl Iterator<Item = u8>) -> Result<usize, 
     Ok(usize::from_ne_bytes(value_bytes))
 }
 
+/// Deserialize a u32 value from bytes.
+pub fn deserialize_u32(bytes: &mut impl Iterator<Item = u8>) -> Result<u32, DeserializeError> {
+    let value_bytes = next_bytes(bytes)?;
+    Ok(u32::from_ne_bytes(value_bytes))
+}
+
 /// Deserialize a u16 value from bytes.
 pub fn deserialize_u16(bytes: &mut impl Iterator<Item = u8>) -> Result<u16, DeserializeError> {
     let value_bytes = next_bytes(bytes)?;
