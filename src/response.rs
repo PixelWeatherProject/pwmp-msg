@@ -47,18 +47,18 @@ impl Response {
     /// Return the type ID.
     pub(crate) const fn type_id(&self) -> u8 {
         match self {
-            Self::Pong => 0,
-            Self::Ok => 1,
-            Self::Reject => 2,
-            Self::InvalidRequest => 3,
-            Self::RateLimitExceeded => 4,
-            Self::InternalServerError => 5,
-            Self::Stalling => 6,
-            Self::FirmwareUpToDate => 7,
-            Self::UpdateAvailable(..) => 8,
-            Self::UpdatePart(..) => 9,
-            Self::UpdateEnd => 10,
-            Self::Settings(..) => 11,
+            Self::Pong => super::serde::consts::RES_KIND_PONG,
+            Self::Ok => super::serde::consts::RES_KIND_OK,
+            Self::Reject => super::serde::consts::RES_KIND_REJECT,
+            Self::InvalidRequest => super::serde::consts::RES_KIND_INVALID_REQ,
+            Self::RateLimitExceeded => super::serde::consts::RES_KIND_RLE,
+            Self::InternalServerError => super::serde::consts::RES_KIND_ISE,
+            Self::Stalling => super::serde::consts::RES_KIND_STALLING,
+            Self::FirmwareUpToDate => super::serde::consts::RES_KIND_FW_UTD,
+            Self::UpdateAvailable(..) => super::serde::consts::RES_KIND_FW_UAVAIL,
+            Self::UpdatePart(..) => super::serde::consts::RES_KIND_FW_UPART,
+            Self::UpdateEnd => super::serde::consts::RES_KIND_FW_UEND,
+            Self::Settings(..) => super::serde::consts::RES_KIND_SETTINGS,
         }
     }
 }
