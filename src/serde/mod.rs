@@ -11,24 +11,28 @@ pub mod error;
 mod serializer;
 mod utils;
 
-/// Serialize a message.
-pub fn serialize(msg: Message) -> Box<[u8]> {
-    let mut buffer = Vec::with_capacity(128);
-
+/// Serialize a message into the specified buffer.
+pub fn serialize_into(msg: Message, buffer: &mut Vec<u8>) {
     // push the message ID
-    msg.id.serialize(&mut buffer);
+    msg.id.serialize(buffer);
 
     // push the message type (req/res)
-    msg.type_id().serialize(&mut buffer);
+    msg.type_id().serialize(buffer);
 
     match msg.content {
         MessageContent::Request(req) => {
-            req.serialize(&mut buffer);
+            req.serialize(buffer);
         }
         MessageContent::Response(res) => {
-            res.serialize(&mut buffer);
+            res.serialize(buffer);
         }
-    }
+    };
+}
+
+/// Serialize a message.
+pub fn serialize(msg: Message) -> Box<[u8]> {
+    let mut buffer = Vec::with_capacity(128);
+    serialize_into(msg, &mut buffer);
 
     // end
     buffer.into_boxed_slice()

@@ -109,10 +109,43 @@ impl Message {
     /// ```
     ///
     /// # Panics
-    /// This will panic if the message could not be serialized.
+    /// Since this method uses dynamically allocated arrays, there may be
+    /// a panic if the allocation fails, or something internally in [Vec`]
+    /// causes a panic.
     #[must_use]
     pub fn serialize(self) -> Box<[u8]> {
         serde::serialize(self)
+    }
+
+    /// Serialize the message into the specified vector.
+    ///
+    /// # Example
+    /// ```rust
+    /// use pwmp_msg::{Message, request::Request};
+    ///
+    /// let mut buffer = Vec::new();
+    ///
+    /// let id = 1;
+    /// let request = Request::Ping;
+    /// let message = Message::new_request(request, id);
+    /// let bytes = message.serialize_into(&mut buffer);
+    /// ```
+    ///
+    /// ```rust
+    /// use pwmp_msg::{Message, response::Response};
+    ///
+    /// let mut buffer = Vec::new();
+    ///
+    /// let id = 1;
+    /// let response = Response::Pong;
+    /// let message = Message::new_response(response, id);
+    /// let bytes = message.serialize_into(&mut buffer);
+    /// ```
+    ///
+    /// # Panics
+    /// This will panic if an allocation fails or the underlying [`Vec`] panics.
+    pub fn serialize_into(self, buffer: &mut Vec<u8>) {
+        serde::serialize_into(self, buffer);
     }
 
     /// Deserialize a message from raw bytes.
