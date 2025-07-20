@@ -33,12 +33,11 @@ pub fn serialize(msg: Message) -> Box<[u8]> {
 
 /// Serialize a request.
 fn serialize_request(req: Request, buffer: &mut Vec<u8>) {
+    // push the request type
     buffer.push(req.type_id());
 
     match req {
-        Request::Ping => {
-            buffer.push(0); // first variant with empty values
-        }
+        Request::Ping => { /* the above push already pushes consts::REQ_KIND_PING */ }
         Request::Handshake { mac } => {
             buffer.extend_from_slice(&[mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]]);
         }
@@ -70,9 +69,7 @@ fn serialize_request(req: Request, buffer: &mut Vec<u8>) {
         Request::SendNotification(content) => {
             utils::serialize_blob(content.as_bytes(), buffer);
         }
-        Request::GetSettings => {
-            buffer.push(1); // second variant with empty values
-        }
+        Request::GetSettings => {}
         Request::UpdateCheck(current_ver) => {
             buffer.reserve(3); // prevent 3 separate allocations
             buffer.push(current_ver.major());
@@ -85,41 +82,24 @@ fn serialize_request(req: Request, buffer: &mut Vec<u8>) {
         Request::ReportFirmwareUpdate(good) => {
             buffer.push(u8::from(good));
         }
-        Request::Bye => {
-            buffer.push(2); // third variant with empty values
-        }
+        Request::Bye => {}
     }
 }
 
 /// Serialize a response.
 fn serialize_response(res: Response, buffer: &mut Vec<u8>) {
+    // push the response type
     buffer.push(res.type_id());
 
     match res {
-        Response::Pong => {
-            buffer.push(consts::RES_KIND_PONG);
-        }
-        Response::Ok => {
-            buffer.push(consts::RES_KIND_OK);
-        }
-        Response::Reject => {
-            buffer.push(consts::RES_KIND_REJECT);
-        }
-        Response::InvalidRequest => {
-            buffer.push(consts::RES_KIND_INVALID_REQ);
-        }
-        Response::RateLimitExceeded => {
-            buffer.push(consts::RES_KIND_RLE);
-        }
-        Response::InternalServerError => {
-            buffer.push(consts::RES_KIND_ISE);
-        }
-        Response::Stalling => {
-            buffer.push(consts::RES_KIND_STALLING);
-        }
-        Response::FirmwareUpToDate => {
-            buffer.push(consts::RES_KIND_FW_UTD);
-        }
+        Response::Pong => {}
+        Response::Ok => {}
+        Response::Reject => {}
+        Response::InvalidRequest => {}
+        Response::RateLimitExceeded => {}
+        Response::InternalServerError => {}
+        Response::Stalling => {}
+        Response::FirmwareUpToDate => {}
         Response::UpdateAvailable(new_version) => {
             buffer.reserve(3); // prevent 3 separate allocations
             buffer.push(new_version.major());
@@ -129,9 +109,7 @@ fn serialize_response(res: Response, buffer: &mut Vec<u8>) {
         Response::UpdatePart(blob) => {
             buffer.extend_from_slice(&blob);
         }
-        Response::UpdateEnd => {
-            buffer.push(consts::RES_KIND_FW_UEND);
-        }
+        Response::UpdateEnd => {}
         Response::Settings(settings) => {
             utils::serialize_optional(
                 settings,
