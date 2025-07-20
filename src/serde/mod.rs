@@ -40,7 +40,7 @@ fn serialize_request(req: Request, buffer: &mut Vec<u8>) {
             buffer.push(0); // first variant with empty values
         }
         Request::Handshake { mac } => {
-            buffer.extend_from_slice(&[mac[0], mac[1], mac[2], mac[3], mac[4], mac[5], mac[6]]);
+            buffer.extend_from_slice(&[mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]]);
         }
         Request::PostResults {
             temperature,
