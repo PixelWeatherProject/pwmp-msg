@@ -132,6 +132,12 @@ impl From<Version> for (u8, u8, u8) {
     }
 }
 
+impl From<[u8; 3]> for Version {
+    fn from(value: [u8; 3]) -> Self {
+        Self::new(value[0], value[1], value[2])
+    }
+}
+
 impl From<(u8, u8, u8)> for Version {
     fn from(value: (u8, u8, u8)) -> Self {
         Self::new(value.0, value.1, value.2)
