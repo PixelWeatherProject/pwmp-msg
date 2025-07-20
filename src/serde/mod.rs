@@ -97,28 +97,28 @@ fn serialize_response(res: Response, buffer: &mut Vec<u8>) {
 
     match res {
         Response::Pong => {
-            buffer.push(0);
+            buffer.push(consts::RES_KIND_PONG);
         }
         Response::Ok => {
-            buffer.push(1);
+            buffer.push(consts::RES_KIND_OK);
         }
         Response::Reject => {
-            buffer.push(2);
+            buffer.push(consts::RES_KIND_REJECT);
         }
         Response::InvalidRequest => {
-            buffer.push(3);
+            buffer.push(consts::RES_KIND_INVALID_REQ);
         }
         Response::RateLimitExceeded => {
-            buffer.push(4);
+            buffer.push(consts::RES_KIND_RLE);
         }
         Response::InternalServerError => {
-            buffer.push(5);
+            buffer.push(consts::RES_KIND_ISE);
         }
         Response::Stalling => {
-            buffer.push(6);
+            buffer.push(consts::RES_KIND_STALLING);
         }
         Response::FirmwareUpToDate => {
-            buffer.push(7);
+            buffer.push(consts::RES_KIND_FW_UTD);
         }
         Response::UpdateAvailable(new_version) => {
             buffer.reserve(3); // prevent 3 separate allocations
@@ -130,7 +130,7 @@ fn serialize_response(res: Response, buffer: &mut Vec<u8>) {
             buffer.extend_from_slice(&blob);
         }
         Response::UpdateEnd => {
-            buffer.push(8);
+            buffer.push(consts::RES_KIND_FW_UEND);
         }
         Response::Settings(settings) => {
             utils::serialize_optional(
