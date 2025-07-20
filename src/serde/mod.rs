@@ -140,7 +140,6 @@ fn serialize_response(res: Response, buffer: &mut Vec<u8>) {
                     buffer.push(u8::from(val.ota));
                     buffer.extend_from_slice(&val.sleep_time.to_ne_bytes());
                     buffer.push(u8::from(val.sbop));
-                    buffer.push(u8::from(val.sbop));
                     buffer.push(u8::from(val.mute_notifications));
                 },
                 buffer,
