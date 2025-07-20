@@ -106,11 +106,11 @@ impl Serializable for Request {
         self.type_id().serialize(buffer);
 
         match self {
-            Request::Ping => { /* the above push already pushes consts::REQ_KIND_PING */ }
-            Request::Handshake { mac } => {
+            Self::Ping | Self::GetSettings | Self::Bye => { /* no additional data to serialize */ }
+            Self::Handshake { mac } => {
                 mac.serialize(buffer);
             }
-            Request::PostResults {
+            Self::PostResults {
                 temperature,
                 humidity,
                 air_pressure,
@@ -119,7 +119,7 @@ impl Serializable for Request {
                 humidity.serialize(buffer);
                 air_pressure.serialize(buffer);
             }
-            Request::PostStats {
+            Self::PostStats {
                 battery,
                 wifi_ssid,
                 wifi_rssi,
@@ -128,20 +128,18 @@ impl Serializable for Request {
                 wifi_ssid.as_ref().serialize(buffer);
                 wifi_rssi.serialize(buffer);
             }
-            Request::SendNotification(content) => {
+            Self::SendNotification(content) => {
                 content.as_ref().serialize(buffer);
             }
-            Request::GetSettings => {}
-            Request::UpdateCheck(current_ver) => {
+            Self::UpdateCheck(current_ver) => {
                 current_ver.serialize(buffer);
             }
-            Request::NextUpdateChunk(size) => {
+            Self::NextUpdateChunk(size) => {
                 size.serialize(buffer);
             }
-            Request::ReportFirmwareUpdate(good) => {
+            Self::ReportFirmwareUpdate(good) => {
                 good.serialize(buffer);
             }
-            Request::Bye => { /* the above push already pushes consts::REQ_KIND_BYE */ }
         }
     }
 }
@@ -152,22 +150,22 @@ impl Serializable for Response {
         self.type_id().serialize(buffer);
 
         match self {
-            Response::Pong => {}
-            Response::Ok => {}
-            Response::Reject => {}
-            Response::InvalidRequest => {}
-            Response::RateLimitExceeded => {}
-            Response::InternalServerError => {}
-            Response::Stalling => {}
-            Response::FirmwareUpToDate => {}
-            Response::UpdateAvailable(new_version) => {
+            Self::Pong
+            | Self::Ok
+            | Self::Reject
+            | Self::InvalidRequest
+            | Self::RateLimitExceeded
+            | Self::InternalServerError
+            | Self::Stalling
+            | Self::FirmwareUpToDate
+            | Self::UpdateEnd => { /* no additional data to serialize */ }
+            Self::UpdateAvailable(new_version) => {
                 new_version.serialize(buffer);
             }
-            Response::UpdatePart(blob) => {
+            Self::UpdatePart(blob) => {
                 blob.as_ref().serialize(buffer);
             }
-            Response::UpdateEnd => {}
-            Response::Settings(settings) => {
+            Self::Settings(settings) => {
                 settings.serialize(buffer);
             }
         }

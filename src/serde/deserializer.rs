@@ -36,7 +36,7 @@ macro_rules! impl_primitive_deserialization {
 impl Deserializable for u8 {
     fn deserialize<I>(bytes: &mut I) -> Result<Self, DeserializeError>
     where
-        I: Iterator<Item = u8>,
+        I: Iterator<Item = Self>,
     {
         utils::next_byte(bytes)
     }
@@ -48,7 +48,7 @@ impl Deserializable for i8 {
         I: Iterator<Item = u8>,
     {
         let value_byte = utils::next_byte(bytes)?;
-        Ok(i8::from_ne_bytes([value_byte]))
+        Ok(Self::from_ne_bytes([value_byte]))
     }
 }
 
@@ -79,7 +79,7 @@ impl Deserializable for Mac {
         I: Iterator<Item = u8>,
     {
         let octets = utils::next_bytes(bytes)?;
-        Ok(Mac::from(octets))
+        Ok(Self::from(octets))
     }
 }
 
@@ -89,7 +89,7 @@ impl Deserializable for Version {
         I: Iterator<Item = u8>,
     {
         let values = utils::next_bytes(bytes)?;
-        Ok(Version::from(values))
+        Ok(Self::from(values))
     }
 }
 
@@ -121,7 +121,7 @@ impl Deserializable for Box<[u8]> {
         I: Iterator<Item = u8>,
     {
         let len = usize::deserialize(bytes)?;
-        let blob: Box<[u8]> = bytes.by_ref().take(len).collect();
+        let blob: Self = bytes.by_ref().take(len).collect();
 
         if blob.len() != len {
             return Err(DeserializeError::ExpectedMoreBytes {
@@ -169,39 +169,39 @@ impl Deserializable for Request {
         let req_type = utils::next_byte(bytes)?;
 
         match req_type {
-            consts::REQ_KIND_PING => Ok(Request::Ping),
+            consts::REQ_KIND_PING => Ok(Self::Ping),
             consts::REQ_KIND_HANDSHAKE => {
                 let mac = Mac::deserialize(bytes)?;
-                Ok(Request::Handshake { mac })
+                Ok(Self::Handshake { mac })
             }
-            consts::REQ_KIND_POST_RESULTS => Ok(Request::PostResults {
+            consts::REQ_KIND_POST_RESULTS => Ok(Self::PostResults {
                 temperature: Temperature::deserialize(bytes)?,
                 humidity: Humidity::deserialize(bytes)?,
                 air_pressure: Option::<AirPressure>::deserialize(bytes)?,
             }),
-            consts::REQ_KIND_POST_STATS => Ok(Request::PostStats {
+            consts::REQ_KIND_POST_STATS => Ok(Self::PostStats {
                 battery: BatteryVoltage::deserialize(bytes)?,
                 wifi_ssid: Box::<str>::deserialize(bytes)?,
                 wifi_rssi: Rssi::deserialize(bytes)?,
             }),
             consts::REQ_KIND_SEND_NOTIFICATION => {
                 let content = Box::<str>::deserialize(bytes)?;
-                Ok(Request::SendNotification(content))
+                Ok(Self::SendNotification(content))
             }
-            consts::REQ_KIND_GET_SETTINGS => Ok(Request::GetSettings),
+            consts::REQ_KIND_GET_SETTINGS => Ok(Self::GetSettings),
             consts::REQ_KIND_UPDATE_CHECK => {
                 let version = Version::deserialize(bytes)?;
-                Ok(Request::UpdateCheck(version))
+                Ok(Self::UpdateCheck(version))
             }
             consts::REQ_KIND_NEXT_UPDATE_CHUNK => {
                 let amount = usize::deserialize(bytes)?;
-                Ok(Request::NextUpdateChunk(amount))
+                Ok(Self::NextUpdateChunk(amount))
             }
             consts::REQ_KIND_REPORT_FWU => {
                 let success = bool::deserialize(bytes)?;
-                Ok(Request::ReportFirmwareUpdate(success))
+                Ok(Self::ReportFirmwareUpdate(success))
             }
-            consts::REQ_KIND_BYE => Ok(Request::Bye),
+            consts::REQ_KIND_BYE => Ok(Self::Bye),
             _ => Err(DeserializeError::IllegalRequestType(req_type)),
         }
     }
@@ -216,26 +216,26 @@ impl Deserializable for Response {
         let res_type = utils::next_byte(bytes)?;
 
         match res_type {
-            consts::RES_KIND_PONG => Ok(Response::Pong),
-            consts::RES_KIND_OK => Ok(Response::Ok),
-            consts::RES_KIND_REJECT => Ok(Response::Reject),
-            consts::RES_KIND_INVALID_REQ => Ok(Response::InvalidRequest),
-            consts::RES_KIND_RLE => Ok(Response::RateLimitExceeded),
-            consts::RES_KIND_ISE => Ok(Response::InternalServerError),
-            consts::RES_KIND_STALLING => Ok(Response::Stalling),
-            consts::RES_KIND_FW_UTD => Ok(Response::FirmwareUpToDate),
+            consts::RES_KIND_PONG => Ok(Self::Pong),
+            consts::RES_KIND_OK => Ok(Self::Ok),
+            consts::RES_KIND_REJECT => Ok(Self::Reject),
+            consts::RES_KIND_INVALID_REQ => Ok(Self::InvalidRequest),
+            consts::RES_KIND_RLE => Ok(Self::RateLimitExceeded),
+            consts::RES_KIND_ISE => Ok(Self::InternalServerError),
+            consts::RES_KIND_STALLING => Ok(Self::Stalling),
+            consts::RES_KIND_FW_UTD => Ok(Self::FirmwareUpToDate),
             consts::RES_KIND_FW_UAVAIL => {
                 let version = Version::deserialize(bytes)?;
-                Ok(Response::UpdateAvailable(version))
+                Ok(Self::UpdateAvailable(version))
             }
             consts::RES_KIND_FW_UPART => {
                 let blob = Box::<[u8]>::deserialize(bytes)?;
-                Ok(Response::UpdatePart(blob))
+                Ok(Self::UpdatePart(blob))
             }
-            consts::RES_KIND_FW_UEND => Ok(Response::UpdateEnd),
+            consts::RES_KIND_FW_UEND => Ok(Self::UpdateEnd),
             consts::RES_KIND_SETTINGS => {
                 let settings = Option::<NodeSettings>::deserialize(bytes)?;
-                Ok(Response::Settings(settings))
+                Ok(Self::Settings(settings))
             }
             _ => Err(DeserializeError::IllegalResponseType(res_type)),
         }
