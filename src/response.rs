@@ -43,3 +43,25 @@ pub enum Response {
     /// Node settings.
     Settings(Option<NodeSettings>),
 }
+
+impl Response {
+    /// Returns whether the result is of an erroneous variant.
+    ///
+    /// ```rust
+    /// use pwmp_msg::response::Response;
+    ///
+    /// assert!(!Response::Ok.is_error());
+    /// assert!(Response::InternalServerError.is_error());
+    /// ```
+    #[must_use]
+    pub const fn is_error(&self) -> bool {
+        matches!(
+            self,
+            Self::Reject
+                | Self::InvalidRequest
+                | Self::RateLimitExceeded
+                | Self::InternalServerError
+                | Self::Stalling
+        )
+    }
+}
