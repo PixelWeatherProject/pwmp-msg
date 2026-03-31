@@ -55,7 +55,7 @@ pub enum Request {
     /// Request a part of a firmware upgrade. The parameter is the maximum chunk size that shall be received.
     ///
     /// **The client must request an update check first before sending this request.**
-    NextUpdateChunk(usize),
+    NextUpdateChunk(u32),
 
     /// Report back about the updated firmware version.
     /// The parameter means whether this new firmware is working, or was bad, and the node has rolled back to a previous version.
