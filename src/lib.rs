@@ -117,7 +117,7 @@ impl Message {
     /// This will panic if the message could not be serialized.
     #[must_use]
     pub fn serialize(self) -> Box<[u8]> {
-        todo!()
+        internal_serde::serialize(self).unwrap()
     }
 
     /// Deserialize a message from raw bytes.

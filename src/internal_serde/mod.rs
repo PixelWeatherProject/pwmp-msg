@@ -5,6 +5,9 @@ use thiserror::Error;
 mod deserializer;
 mod serializer;
 
+/// Alias to the integer type used to define the length of a bytes object.
+pub type BytesLength = u16;
+
 /// unfinished
 #[derive(Debug, Error)]
 pub enum SerdeError {

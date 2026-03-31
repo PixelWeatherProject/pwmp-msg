@@ -1,11 +1,9 @@
 //! unfinished
 
+use super::BytesLength;
 use crate::{request::Request, response::Response, Message, MessageContent};
 use bytes::BufMut;
 use thiserror::Error;
-
-/// Alias to the integer type used to define the length of a bytes object.
-pub type BytesLength = u16;
 
 /// unfinished
 #[derive(Debug, Error)]
