@@ -1,11 +1,10 @@
 //! Contains the definition of a simple version structure for storing
 //! and representing semantic version numbers (`X.Y.Z`).
 
-use serde::{Deserialize, Serialize};
 use std::{fmt::Display, str::FromStr};
 
 /// A structure that represents a semantic version (eg. `1.0.0`) with a major part (`1`), middle part (`0`) and a minor part (`0`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub struct Version {
     /// Major number.
     major: u8,
