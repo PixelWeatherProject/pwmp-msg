@@ -19,6 +19,7 @@ bytes = "1.11.1"
 derive_more = { version = "2.1.1", default-features = false, features = [
     "debug",
 ] }
+thiserror = "2.0.18"
 
 [dev-dependencies]
 criterion = { version = "0.8.2", features = ["html_reports"] }

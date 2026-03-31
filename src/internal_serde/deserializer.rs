@@ -1,8 +1,10 @@
 //! unfinished
 
 use crate::Message;
+use thiserror::Error;
 
 /// unfinished
+#[derive(Debug, Error)]
 pub enum DeserializeError {}
 
 /// unfinished
