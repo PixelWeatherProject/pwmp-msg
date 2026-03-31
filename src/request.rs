@@ -64,3 +64,26 @@ pub enum Request {
     /// Tell the server that the session is over and the node will disconnect.
     Bye,
 }
+
+impl Request {
+    /// Message ID for [`Request::Ping`].
+    pub const MSG_ID_PING: u8 = 0;
+    /// Message ID for [`Request::Handshake`].
+    pub const MSG_ID_HANDSHAKE: u8 = 1;
+    /// Message ID for [`Request::PostResults`].
+    pub const MSG_ID_POST_RESULTS: u8 = 2;
+    /// Message ID for [`Request::PostStats`].
+    pub const MSG_ID_POST_STATS: u8 = 3;
+    /// Message ID for [`Request::SendNotification`].
+    pub const MSG_ID_SEND_NOTIFICATION: u8 = 4;
+    /// Message ID for [`Request::GetSettings`].
+    pub const MSG_ID_GET_SETTINGS: u8 = 5;
+    /// Message ID for [`Request::UpdateCheck`].
+    pub const MSG_ID_UPDATE_CHECK: u8 = 6;
+    /// Message ID for [`Request::NextUpdateChunk`].
+    pub const MSG_ID_NEXT_UPDATE_CHUNK: u8 = 7;
+    /// Message ID for [`Request::ReportFirmwareUpdate`].
+    pub const MSG_ID_REPORT_FIRMWARE_UPDATE: u8 = 8;
+    /// Message ID for [`Request::Bye`].
+    pub const MSG_ID_BYE: u8 = 9;
+}

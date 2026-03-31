@@ -45,6 +45,11 @@ enum MessageContent {
 }
 
 impl Message {
+    /// Message ID for a [`Request`](request::Request).
+    pub const MSG_ID_REQUEST: u8 = 0;
+    /// Message ID for a [`Response`](response::Response).
+    pub const MSG_ID_RESPONSE: u8 = 1;
+
     /// Wrap a request and assign the given ID to the message.
     ///
     /// # Example
