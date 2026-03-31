@@ -5,6 +5,7 @@
 //! This library contains the definitions of all possible messages in the PWMP.
 
 pub mod aliases;
+mod internal_serde;
 pub mod mac;
 pub mod request;
 pub mod response;
