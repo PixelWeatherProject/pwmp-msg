@@ -5,7 +5,6 @@ use crate::{
     mac::Mac, request::Request, response::Response, settings::NodeSettings, version::Version,
     Message,
 };
-use bytes::Buf;
 use std::io::{Cursor, Read};
 use thiserror::Error;
 
@@ -17,8 +16,8 @@ pub enum DeserializeError {
     EmptyBuf,
 
     /// Not enough bytes could be read from the buffer
-    #[error("Buffer was exhausted while reading: {0}")]
-    Exhausted(#[from] bytes::TryGetError),
+    #[error("Buffer was exhausted while reading, expected {0} bytes")]
+    Exhausted(usize),
 
     /// There are still some bytes left in the buffer after deserialization
     #[error("Unprocessed bytes left in the buffer")]
@@ -60,8 +59,8 @@ pub fn deserialize(bytes: &[u8]) -> Result<Message, DeserializeError> {
     }
 
     let mut buffer = Cursor::new(bytes);
-    let mid = buffer.try_get_u32()?;
-    let kind = buffer.try_get_u8()?;
+    let mid = deserialize_u32(&mut buffer)?;
+    let kind = deserrialize_byte(&mut buffer)?;
 
     let message = match kind {
         Message::MSG_ID_REQUEST => {
@@ -75,7 +74,7 @@ pub fn deserialize(bytes: &[u8]) -> Result<Message, DeserializeError> {
         _ => return Err(DeserializeError::IllegalVariantIdentifier(kind)),
     };
 
-    if buffer.has_remaining() {
+    if buffer.position() != bytes.len() as _ {
         return Err(DeserializeError::NotExhausted);
     }
 
@@ -84,7 +83,7 @@ pub fn deserialize(bytes: &[u8]) -> Result<Message, DeserializeError> {
 
 /// unfinished
 fn deserialize_request(buffer: &mut Cursor<&[u8]>) -> Result<Request, DeserializeError> {
-    let variant = buffer.try_get_u8()?;
+    let variant = deserrialize_byte(buffer)?;
 
     match variant {
         Request::MSG_ID_PING => Ok(Request::Ping),
@@ -92,17 +91,17 @@ fn deserialize_request(buffer: &mut Cursor<&[u8]>) -> Result<Request, Deserializ
             let mut mac = Mac::new(0, 0, 0, 0, 0, 0);
 
             for i in 0..6 {
-                mac[i] = buffer.try_get_u8()?;
+                mac[i] = deserrialize_byte(buffer)?;
             }
 
             Ok(Request::Handshake { mac })
         }
         Request::MSG_ID_POST_RESULTS => {
-            let temperature = buffer.try_get_f32()?;
-            let humidity = buffer.try_get_u8()?;
-            let air_pressure = match buffer.try_get_u8()? {
+            let temperature = deserialize_f32(buffer)?;
+            let humidity = deserrialize_byte(buffer)?;
+            let air_pressure = match deserrialize_byte(buffer)? {
                 0 => None,
-                1 => Some(buffer.try_get_u16()?),
+                1 => Some(deserialize_u16(buffer)?),
                 other => return Err(DeserializeError::IllegalOptionalIdentifier(other)),
             };
 
@@ -113,9 +112,9 @@ fn deserialize_request(buffer: &mut Cursor<&[u8]>) -> Result<Request, Deserializ
             })
         }
         Request::MSG_ID_POST_STATS => {
-            let battery = buffer.try_get_f32()?;
+            let battery = deserialize_f32(buffer)?;
             let wifi_ssid = deserialize_string(buffer)?;
-            let wifi_rssi = buffer.try_get_i8()?;
+            let wifi_rssi = deserrialize_i8(buffer)?;
 
             Ok(Request::PostStats {
                 battery,
@@ -124,21 +123,11 @@ fn deserialize_request(buffer: &mut Cursor<&[u8]>) -> Result<Request, Deserializ
             })
         }
         Request::MSG_ID_SEND_NOTIFICATION => {
-            let content = deserialize_string(buffer)?;
-            Ok(Request::SendNotification(content))
+            Ok(Request::SendNotification(deserialize_string(buffer)?))
         }
         Request::MSG_ID_GET_SETTINGS => Ok(Request::GetSettings),
-        Request::MSG_ID_UPDATE_CHECK => {
-            let major = buffer.try_get_u8()?;
-            let middle = buffer.try_get_u8()?;
-            let minor = buffer.try_get_u8()?;
-
-            Ok(Request::UpdateCheck(Version::new(major, middle, minor)))
-        }
-        Request::MSG_ID_NEXT_UPDATE_CHUNK => {
-            let size = buffer.try_get_u32()?;
-            Ok(Request::NextUpdateChunk(size))
-        }
+        Request::MSG_ID_UPDATE_CHECK => Ok(Request::UpdateCheck(deserialize_version(buffer)?)),
+        Request::MSG_ID_NEXT_UPDATE_CHUNK => Ok(Request::NextUpdateChunk(deserialize_u32(buffer)?)),
         Request::MSG_ID_REPORT_FIRMWARE_UPDATE => {
             let success = deserialize_bool(buffer)?;
             Ok(Request::ReportFirmwareUpdate(success))
@@ -150,7 +139,7 @@ fn deserialize_request(buffer: &mut Cursor<&[u8]>) -> Result<Request, Deserializ
 
 /// unfinished
 fn deserialize_response(buffer: &mut Cursor<&[u8]>) -> Result<Response, DeserializeError> {
-    let variant = buffer.try_get_u8()?;
+    let variant = deserrialize_byte(buffer)?;
 
     match variant {
         Response::MSG_ID_PONG => Ok(Response::Pong),
@@ -162,25 +151,19 @@ fn deserialize_response(buffer: &mut Cursor<&[u8]>) -> Result<Response, Deserial
         Response::MSG_ID_STALLING => Ok(Response::Stalling),
         Response::MSG_ID_FIRMWARE_UP_TO_DATE => Ok(Response::FirmwareUpToDate),
         Response::MSG_ID_UPDATE_AVAILABLE => {
-            let major = buffer.try_get_u8()?;
-            let middle = buffer.try_get_u8()?;
-            let minor = buffer.try_get_u8()?;
-
-            Ok(Response::UpdateAvailable(Version::new(
-                major, middle, minor,
-            )))
+            Ok(Response::UpdateAvailable(deserialize_version(buffer)?))
         }
         Response::MSG_ID_UPDATE_PART => {
             let blob = deserialize_bytes(buffer)?;
             Ok(Response::UpdatePart(blob))
         }
         Response::MSG_ID_UPDATE_END => Ok(Response::UpdateEnd),
-        Response::MSG_ID_SETTINGS => match buffer.try_get_u8()? {
+        Response::MSG_ID_SETTINGS => match deserrialize_byte(buffer)? {
             0 => Ok(Response::Settings(None)),
             1 => {
                 let battery_ignore = deserialize_bool(buffer)?;
                 let ota = deserialize_bool(buffer)?;
-                let sleep_time = buffer.try_get_u16()?;
+                let sleep_time = deserialize_u16(buffer)?;
                 let sbop = deserialize_bool(buffer)?;
                 let mute_notifications = deserialize_bool(buffer)?;
 
@@ -199,8 +182,14 @@ fn deserialize_response(buffer: &mut Cursor<&[u8]>) -> Result<Response, Deserial
 }
 
 /// unfinished
+fn deserialize_version(buffer: &mut Cursor<&[u8]>) -> Result<Version, DeserializeError> {
+    let parts: [u8; 3] = read_n_bytes(buffer)?;
+    Ok(Version::new(parts[0], parts[1], parts[2]))
+}
+
+/// unfinished
 fn deserialize_bytes(buffer: &mut Cursor<&[u8]>) -> Result<Box<[u8]>, DeserializeError> {
-    let size: BytesLength = buffer.try_get_u16()?;
+    let size: BytesLength = deserialize_u16(buffer)?;
     let mut content = vec![0; usize::from(size)];
     buffer.read_exact(&mut content)?;
 
@@ -215,9 +204,43 @@ fn deserialize_string(buffer: &mut Cursor<&[u8]>) -> Result<Box<str>, Deserializ
 
 /// unfinished
 fn deserialize_bool(buffer: &mut Cursor<&[u8]>) -> Result<bool, DeserializeError> {
-    match buffer.try_get_u8()? {
+    match deserrialize_byte(buffer)? {
         0 => Ok(false),
         1 => Ok(true),
         other => Err(DeserializeError::IllegalBooleanValue(other)),
     }
+}
+
+/// unfinished
+fn deserialize_f32(buffer: &mut Cursor<&[u8]>) -> Result<f32, DeserializeError> {
+    Ok(f32::from_be_bytes(read_n_bytes(buffer)?))
+}
+
+/// unfinished
+fn deserialize_u32(buffer: &mut Cursor<&[u8]>) -> Result<u32, DeserializeError> {
+    Ok(u32::from_be_bytes(read_n_bytes(buffer)?))
+}
+
+/// unfinished
+fn deserialize_u16(buffer: &mut Cursor<&[u8]>) -> Result<u16, DeserializeError> {
+    Ok(u16::from_be_bytes(read_n_bytes(buffer)?))
+}
+
+/// unfinished
+fn deserrialize_i8(buffer: &mut Cursor<&[u8]>) -> Result<i8, DeserializeError> {
+    Ok(i8::from_be_bytes(read_n_bytes(buffer)?))
+}
+
+/// unfinished
+fn deserrialize_byte(buffer: &mut Cursor<&[u8]>) -> Result<u8, DeserializeError> {
+    Ok(u8::from_be_bytes(read_n_bytes(buffer)?))
+}
+
+/// unfinished
+fn read_n_bytes<const N: usize>(buffer: &mut Cursor<&[u8]>) -> Result<[u8; N], DeserializeError> {
+    let mut result = [0; N];
+    buffer
+        .read_exact(&mut result)
+        .map_err(|_| DeserializeError::Exhausted(N))?;
+    Ok(result)
 }
