@@ -139,12 +139,10 @@ pub fn serialize_response(res: Response, buffer: &mut Vec<u8>) -> Result<(), Ser
 
 /// unfinished
 fn serilaize_bytes(val: &[u8], buffer: &mut Vec<u8>) -> Result<(), SerializeError> {
-    if val.len() > usize::from(BytesLength::MAX) {
-        return Err(SerializeError::BytesObjectTooLarge(val.len()));
-    }
-
-    // SAFETY: The length is checked above so it won't exceed what `BytesLength` can hold.
-    let size = unsafe { BytesLength::try_from(val.len()).unwrap_unchecked() };
+    let size: BytesLength = val
+        .len()
+        .try_into()
+        .map_err(|_| SerializeError::BytesObjectTooLarge(val.len()))?;
 
     buffer.extend_from_slice(&size.to_be_bytes());
     buffer.extend_from_slice(val);
