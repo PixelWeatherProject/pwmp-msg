@@ -63,6 +63,8 @@ pub fn serialize_request(req: Request, buffer: &mut Vec<u8>) -> Result<(), Seria
             wifi_ssid,
             wifi_rssi,
         } => {
+            // adding a reservation here seems to improve performance by 10%
+            buffer.reserve(8 + wifi_ssid.len());
             buffer.push(Request::MSG_ID_POST_STATS);
             buffer.extend_from_slice(&battery.to_be_bytes());
             serialize_string(&wifi_ssid, buffer)?;
