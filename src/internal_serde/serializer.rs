@@ -1,7 +1,7 @@
 //! unfinished
 
 use super::BytesLength;
-use crate::{request::Request, response::Response, Message, MessageContent};
+use crate::{request::Request, response::Response, version::Version, Message, MessageContent};
 use bytes::BufMut;
 use thiserror::Error;
 
@@ -75,9 +75,7 @@ pub fn serialize_request(req: Request, buffer: &mut Vec<u8>) -> Result<(), Seria
         }
         Request::UpdateCheck(version) => {
             buffer.put_u8(Request::MSG_ID_UPDATE_CHECK);
-            buffer.put_u8(version.major());
-            buffer.put_u8(version.middle());
-            buffer.put_u8(version.minor());
+            serialize_version(version, buffer);
         }
         Request::NextUpdateChunk(chunk) => {
             buffer.put_u8(Request::MSG_ID_NEXT_UPDATE_CHUNK);
@@ -110,9 +108,7 @@ pub fn serialize_response(res: Response, buffer: &mut Vec<u8>) -> Result<(), Ser
         Response::FirmwareUpToDate => buffer.put_u8(Response::MSG_ID_FIRMWARE_UP_TO_DATE),
         Response::UpdateAvailable(version) => {
             buffer.put_u8(Response::MSG_ID_UPDATE_AVAILABLE);
-            buffer.put_u8(version.major());
-            buffer.put_u8(version.middle());
-            buffer.put_u8(version.minor());
+            serialize_version(version, buffer);
         }
         Response::UpdatePart(items) => {
             buffer.put_u8(Response::MSG_ID_UPDATE_PART);
@@ -157,4 +153,11 @@ fn serilaize_bytes(val: &[u8], buffer: &mut Vec<u8>) -> Result<(), SerializeErro
 /// unfinished
 fn serialize_string(val: &str, buffer: &mut Vec<u8>) -> Result<(), SerializeError> {
     serilaize_bytes(val.as_bytes(), buffer)
+}
+
+/// unfinished
+fn serialize_version(val: Version, buffer: &mut Vec<u8>) {
+    buffer.put_u8(val.major());
+    buffer.put_u8(val.middle());
+    buffer.put_u8(val.minor());
 }
