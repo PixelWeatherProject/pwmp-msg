@@ -1,10 +1,10 @@
-//! unfinished
+//! Serialization utilities.
 
 use super::{BytesLength, OPTIONAL_VALUE_EXISTS, OPTIONAL_VALUE_VACANT};
 use crate::{request::Request, response::Response, version::Version, Message, MessageContent};
 use thiserror::Error;
 
-/// unfinished
+/// A serialization error.
 #[derive(Debug, Error)]
 pub enum SerializeError {
     /// Bytes object (byte array or string) is too large.
@@ -12,7 +12,11 @@ pub enum SerializeError {
     BytesObjectTooLarge(usize),
 }
 
-/// unfinished
+/// Serialize a [`Message`] into raw bytes.
+///
+/// # Errors
+/// Returns [`SerializeError`] when:
+/// - a string or byte blob is too large to serialize ([`BytesObjectTooLarge`](SerializeError::BytesObjectTooLarge)).
 pub fn serialize(message: Message) -> Result<Box<[u8]>, SerializeError> {
     // Theoretical ideal value is 8.
     // MSG ID (4 bytes) + Req/Res type ID (1 byte) + Data (min. 1 byte) = 6 bytes
@@ -29,7 +33,10 @@ pub fn serialize(message: Message) -> Result<Box<[u8]>, SerializeError> {
     Ok(buffer.into_boxed_slice())
 }
 
-/// unfinished
+/// Serialize a [`Request`].
+///
+/// # Errors
+/// See `Errors` section of [`serialize()`].
 pub fn serialize_request(req: Request, buffer: &mut Vec<u8>) -> Result<(), SerializeError> {
     buffer.push(Message::MSG_ID_REQUEST);
 
@@ -97,7 +104,10 @@ pub fn serialize_request(req: Request, buffer: &mut Vec<u8>) -> Result<(), Seria
     Ok(())
 }
 
-/// unfinished
+/// Serialize a [`Response`].
+///
+/// # Errors
+/// See `Errors` section of [`serialize()`].
 pub fn serialize_response(res: Response, buffer: &mut Vec<u8>) -> Result<(), SerializeError> {
     buffer.push(Message::MSG_ID_RESPONSE);
 
@@ -139,7 +149,11 @@ pub fn serialize_response(res: Response, buffer: &mut Vec<u8>) -> Result<(), Ser
     Ok(())
 }
 
-/// unfinished
+/// Serialize a blob payload.
+///
+/// # Errors
+/// Returns a [`BytesObjectTooLarge`](SerializeError::BytesObjectTooLarge) if the length
+/// of the blob is larger than what [`BytesLength`] can represent ([`BytesLength::MAX`](BytesLength::MAX)).
 fn serilaize_bytes(val: &[u8], buffer: &mut Vec<u8>) -> Result<(), SerializeError> {
     let size: BytesLength = val
         .len()
@@ -152,12 +166,15 @@ fn serilaize_bytes(val: &[u8], buffer: &mut Vec<u8>) -> Result<(), SerializeErro
     Ok(())
 }
 
-/// unfinished
+/// Serialize a string payload
+///
+/// # Errors
+/// See `Errors` section of [`serilaize_bytes()`].
 fn serialize_string(val: &str, buffer: &mut Vec<u8>) -> Result<(), SerializeError> {
     serilaize_bytes(val.as_bytes(), buffer)
 }
 
-/// unfinished
+/// Serialiaze a [`Version`] struct payload.
 fn serialize_version(val: Version, buffer: &mut Vec<u8>) {
     buffer.push(val.major());
     buffer.push(val.middle());

@@ -1,4 +1,4 @@
-//! unfinished
+//! Deserialization utilities.
 
 use super::{BytesLength, OPTIONAL_VALUE_EXISTS, OPTIONAL_VALUE_VACANT};
 use crate::{
@@ -8,7 +8,7 @@ use crate::{
 use std::io::{Cursor, Read};
 use thiserror::Error;
 
-/// unfinished
+/// A deserialization error.
 #[derive(Debug, Error)]
 pub enum DeserializeError {
     /// Empty bytes buffer was provided
@@ -52,7 +52,15 @@ pub enum DeserializeError {
     Io(#[from] std::io::Error),
 }
 
-/// unfinished
+/// Deserializes a raw byte buffer into a [`Message`].
+///
+/// # Errors
+/// Returns [`DeserializeError`] when:
+/// - the input is empty ([`EmptyBuf`](DeserializeError));
+/// - the buffer ends before all required fields are read ([`Exhausted`](DeserializeError::Exhausted));
+/// - unknown message/request/response identifiers are encountered;
+/// - malformed optional/boolean/string fields are found;
+/// - extra trailing bytes remain after decoding ([`NotExhausted`](DeserializeError::NotExhausted)).
 pub fn deserialize(bytes: &[u8]) -> Result<Message, DeserializeError> {
     if bytes.is_empty() {
         return Err(DeserializeError::EmptyBuf);
@@ -81,7 +89,10 @@ pub fn deserialize(bytes: &[u8]) -> Result<Message, DeserializeError> {
     Ok(message)
 }
 
-/// unfinished
+/// Deserializes a [`Request`].
+///
+/// # Errors
+/// Read `Errors` section of [`deserialize()`].
 fn deserialize_request(buffer: &mut Cursor<&[u8]>) -> Result<Request, DeserializeError> {
     let variant = deserialize_byte(buffer)?;
 
@@ -137,7 +148,10 @@ fn deserialize_request(buffer: &mut Cursor<&[u8]>) -> Result<Request, Deserializ
     }
 }
 
-/// unfinished
+/// Deserializes a [`Response`].
+///
+/// # Errors
+/// Read `Errors` section of [`deserialize()`].
 fn deserialize_response(buffer: &mut Cursor<&[u8]>) -> Result<Response, DeserializeError> {
     let variant = deserialize_byte(buffer)?;
 
@@ -181,13 +195,21 @@ fn deserialize_response(buffer: &mut Cursor<&[u8]>) -> Result<Response, Deserial
     }
 }
 
-/// unfinished
+/// Deserializes a [`Version`] payload.
+///
+/// # Errors
+/// Returns an [`Exhausted`](DeserializeError::Exhausted) error if not enough bytes (3)
+/// could be read from the cursor.
 fn deserialize_version(buffer: &mut Cursor<&[u8]>) -> Result<Version, DeserializeError> {
     let parts: [u8; 3] = read_n_bytes(buffer)?;
     Ok(Version::new(parts[0], parts[1], parts[2]))
 }
 
-/// unfinished
+/// Deserializes a blob payload.
+///
+/// # Errors
+/// Returns an [`Exhausted`](DeserializeError::Exhausted) error if not enough bytes (3)
+/// could be read from the cursor, or an [`io::Error`](std::io::Error).
 fn deserialize_bytes(buffer: &mut Cursor<&[u8]>) -> Result<Box<[u8]>, DeserializeError> {
     let size: BytesLength = deserialize_u16(buffer)?;
     let mut content = vec![0; usize::from(size)];
@@ -196,13 +218,21 @@ fn deserialize_bytes(buffer: &mut Cursor<&[u8]>) -> Result<Box<[u8]>, Deserializ
     Ok(content.into_boxed_slice())
 }
 
-/// unfinished
+/// Deserializes a UTF-8 encoded string payload.
+///
+/// # Errors
+/// See `Errors` section of [`deserialize_bytes`](deserialize_bytes). Could also return
+/// an [`FromUtf8Error`](std::string::FromUtf8Error) if the string is not correctly encoded.
 fn deserialize_string(buffer: &mut Cursor<&[u8]>) -> Result<Box<str>, DeserializeError> {
     let bytes = deserialize_bytes(buffer)?;
     Ok(String::from_utf8(bytes.to_vec())?.into_boxed_str())
 }
 
-/// unfinished
+/// Deserializes a boolean payload.
+///
+/// # Errors
+/// Returns an [`IllegalBooleanValue`](DeserializeError::IllegalBooleanValue) error if
+/// the byte representing the boolean value is not 0 or 1.
 fn deserialize_bool(buffer: &mut Cursor<&[u8]>) -> Result<bool, DeserializeError> {
     match deserialize_byte(buffer)? {
         0 => Ok(false),
@@ -211,32 +241,50 @@ fn deserialize_bool(buffer: &mut Cursor<&[u8]>) -> Result<bool, DeserializeError
     }
 }
 
-/// unfinished
+/// Deserializes an [`f32`] payload.
+///
+/// # Errors
+/// Read `Errors` section of [`read_n_bytes()`].
 fn deserialize_f32(buffer: &mut Cursor<&[u8]>) -> Result<f32, DeserializeError> {
     Ok(f32::from_be_bytes(read_n_bytes(buffer)?))
 }
 
-/// unfinished
+/// Deserializes an [`u32`] payload.
+///
+/// # Errors
+/// Read `Errors` section of [`read_n_bytes()`].
 fn deserialize_u32(buffer: &mut Cursor<&[u8]>) -> Result<u32, DeserializeError> {
     Ok(u32::from_be_bytes(read_n_bytes(buffer)?))
 }
 
-/// unfinished
+/// Deserializes an [`u16`] payload.
+///
+/// # Errors
+/// Read `Errors` section of [`read_n_bytes()`].
 fn deserialize_u16(buffer: &mut Cursor<&[u8]>) -> Result<u16, DeserializeError> {
     Ok(u16::from_be_bytes(read_n_bytes(buffer)?))
 }
 
-/// unfinished
+/// Deserializes an [`i8`] payload.
+///
+/// # Errors
+/// Read `Errors` section of [`read_n_bytes()`].
 fn deserrialize_i8(buffer: &mut Cursor<&[u8]>) -> Result<i8, DeserializeError> {
     Ok(i8::from_be_bytes(read_n_bytes(buffer)?))
 }
 
-/// unfinished
+/// Deserializes an [`u8`] payload.
+///
+/// # Errors
+/// Read `Errors` section of [`read_n_bytes()`].
 fn deserialize_byte(buffer: &mut Cursor<&[u8]>) -> Result<u8, DeserializeError> {
     Ok(u8::from_be_bytes(read_n_bytes(buffer)?))
 }
 
-/// unfinished
+/// Reads `N` bytes from the cursor into a statically allocated array.
+///
+/// # Errors
+/// Returns an [`Exhausted`](DeserializeError::Exhausted) error if less than `N` bytes were read.
 fn read_n_bytes<const N: usize>(buffer: &mut Cursor<&[u8]>) -> Result<[u8; N], DeserializeError> {
     let mut result = [0; N];
     buffer

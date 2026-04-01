@@ -1,4 +1,4 @@
-//! unfinished
+//! Serialization and deserialization utilities.
 
 mod deserializer;
 mod serializer;
