@@ -1,10 +1,12 @@
 //! unfinished
 
-use std::io::{Cursor, Read};
-
 use super::BytesLength;
-use crate::{mac::Mac, request::Request, version::Version, Message};
+use crate::{
+    mac::Mac, request::Request, response::Response, settings::NodeSettings, version::Version,
+    Message,
+};
 use bytes::Buf;
+use std::io::{Cursor, Read};
 use thiserror::Error;
 
 /// unfinished
@@ -23,8 +25,12 @@ pub enum DeserializeError {
     IllegalVariantIdentifier(u8),
 
     /// Invalid [`Request`] type identifier
-    #[error("Invalid message type: {0}")]
+    #[error("Invalid request message type: {0}")]
     IllegalRequestVariantIdentifier(u8),
+
+    /// Invalid [`Response`] type identifier
+    #[error("Invalid response message type: {0}")]
+    IllegalResponseVariantIdentifier(u8),
 
     /// Invalid optional value identifier
     #[error("Optional value identifier '{0}' is invalid")]
@@ -59,9 +65,8 @@ pub fn deserialize(bytes: &[u8]) -> Result<Message, DeserializeError> {
             Message::new_request(req, mid)
         }
         Message::MSG_ID_RESPONSE => {
-            //let res = deserialize_response(&mut bytes)?;
-            //Message::new_response(res, mid)
-            todo!()
+            let res = deserialize_response(&mut buffer)?;
+            Message::new_response(res, mid)
         }
         _ => return Err(DeserializeError::IllegalVariantIdentifier(kind)),
     };
@@ -127,15 +132,61 @@ fn deserialize_request(buffer: &mut Cursor<&[u8]>) -> Result<Request, Deserializ
             Ok(Request::NextUpdateChunk(size))
         }
         Request::MSG_ID_REPORT_FIRMWARE_UPDATE => {
-            let success = buffer.try_get_u8()?;
-            match success {
-                0 => Ok(Request::ReportFirmwareUpdate(false)),
-                1 => Ok(Request::ReportFirmwareUpdate(true)),
-                _ => Err(DeserializeError::IllegalBooleanValue(success)),
-            }
+            let success = deserialize_bool(buffer)?;
+            Ok(Request::ReportFirmwareUpdate(success))
         }
         Request::MSG_ID_BYE => Ok(Request::Bye),
         _ => Err(DeserializeError::IllegalRequestVariantIdentifier(variant)),
+    }
+}
+
+/// unfinished
+fn deserialize_response(buffer: &mut Cursor<&[u8]>) -> Result<Response, DeserializeError> {
+    let variant = buffer.try_get_u8()?;
+
+    match variant {
+        Response::MSG_ID_PONG => Ok(Response::Pong),
+        Response::MSG_ID_OK => Ok(Response::Ok),
+        Response::MSG_ID_REJECT => Ok(Response::Reject),
+        Response::MSG_ID_INVALID_REQUEST => Ok(Response::InvalidRequest),
+        Response::MSG_ID_RATE_LIMIT_EXCEEDED => Ok(Response::RateLimitExceeded),
+        Response::MSG_ID_INTERNAL_SERVER_ERROR => Ok(Response::InternalServerError),
+        Response::MSG_ID_STALLING => Ok(Response::Stalling),
+        Response::MSG_ID_FIRMWARE_UP_TO_DATE => Ok(Response::FirmwareUpToDate),
+        Response::MSG_ID_UPDATE_AVAILABLE => {
+            let major = buffer.try_get_u8()?;
+            let middle = buffer.try_get_u8()?;
+            let minor = buffer.try_get_u8()?;
+
+            Ok(Response::UpdateAvailable(Version::new(
+                major, middle, minor,
+            )))
+        }
+        Response::MSG_ID_UPDATE_PART => {
+            let blob = deserialize_bytes(buffer)?;
+            Ok(Response::UpdatePart(blob))
+        }
+        Response::MSG_ID_UPDATE_END => Ok(Response::UpdateEnd),
+        Response::MSG_ID_SETTINGS => match buffer.try_get_u8()? {
+            0 => Ok(Response::Settings(None)),
+            1 => {
+                let battery_ignore = deserialize_bool(buffer)?;
+                let ota = deserialize_bool(buffer)?;
+                let sleep_time = buffer.try_get_u16()?;
+                let sbop = deserialize_bool(buffer)?;
+                let mute_notifications = deserialize_bool(buffer)?;
+
+                Ok(Response::Settings(Some(NodeSettings {
+                    battery_ignore,
+                    ota,
+                    sleep_time,
+                    sbop,
+                    mute_notifications,
+                })))
+            }
+            other => Err(DeserializeError::IllegalOptionalIdentifier(other)),
+        },
+        _ => Err(DeserializeError::IllegalResponseVariantIdentifier(variant)),
     }
 }
 
@@ -152,4 +203,13 @@ fn deserialize_bytes(buffer: &mut Cursor<&[u8]>) -> Result<Box<[u8]>, Deserializ
 fn deserialize_string(buffer: &mut Cursor<&[u8]>) -> Result<Box<str>, DeserializeError> {
     let bytes = deserialize_bytes(buffer)?;
     Ok(String::from_utf8(bytes.to_vec())?.into_boxed_str())
+}
+
+/// unfinished
+fn deserialize_bool(buffer: &mut Cursor<&[u8]>) -> Result<bool, DeserializeError> {
+    match buffer.try_get_u8()? {
+        0 => Ok(false),
+        1 => Ok(true),
+        other => Err(DeserializeError::IllegalBooleanValue(other)),
+    }
 }
