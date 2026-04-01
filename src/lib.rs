@@ -13,7 +13,7 @@ pub mod settings;
 pub mod version;
 
 /// Message ID type.
-pub type MsgId = u32;
+pub type MsgId = u8;
 
 /// A Message object.
 /// Can either be a request or a response.

@@ -59,8 +59,8 @@ pub fn deserialize(bytes: &[u8]) -> Result<Message, DeserializeError> {
     }
 
     let mut buffer = Cursor::new(bytes);
-    let mid = deserialize_u32(&mut buffer)?;
-    let kind = deserrialize_byte(&mut buffer)?;
+    let mid = deserialize_byte(&mut buffer)?;
+    let kind = deserialize_byte(&mut buffer)?;
 
     let message = match kind {
         Message::MSG_ID_REQUEST => {
@@ -83,7 +83,7 @@ pub fn deserialize(bytes: &[u8]) -> Result<Message, DeserializeError> {
 
 /// unfinished
 fn deserialize_request(buffer: &mut Cursor<&[u8]>) -> Result<Request, DeserializeError> {
-    let variant = deserrialize_byte(buffer)?;
+    let variant = deserialize_byte(buffer)?;
 
     match variant {
         Request::MSG_ID_PING => Ok(Request::Ping),
@@ -91,15 +91,15 @@ fn deserialize_request(buffer: &mut Cursor<&[u8]>) -> Result<Request, Deserializ
             let mut mac = Mac::new(0, 0, 0, 0, 0, 0);
 
             for i in 0..6 {
-                mac[i] = deserrialize_byte(buffer)?;
+                mac[i] = deserialize_byte(buffer)?;
             }
 
             Ok(Request::Handshake { mac })
         }
         Request::MSG_ID_POST_RESULTS => {
             let temperature = deserialize_f32(buffer)?;
-            let humidity = deserrialize_byte(buffer)?;
-            let air_pressure = match deserrialize_byte(buffer)? {
+            let humidity = deserialize_byte(buffer)?;
+            let air_pressure = match deserialize_byte(buffer)? {
                 0 => None,
                 1 => Some(deserialize_u16(buffer)?),
                 other => return Err(DeserializeError::IllegalOptionalIdentifier(other)),
@@ -139,7 +139,7 @@ fn deserialize_request(buffer: &mut Cursor<&[u8]>) -> Result<Request, Deserializ
 
 /// unfinished
 fn deserialize_response(buffer: &mut Cursor<&[u8]>) -> Result<Response, DeserializeError> {
-    let variant = deserrialize_byte(buffer)?;
+    let variant = deserialize_byte(buffer)?;
 
     match variant {
         Response::MSG_ID_PONG => Ok(Response::Pong),
@@ -158,7 +158,7 @@ fn deserialize_response(buffer: &mut Cursor<&[u8]>) -> Result<Response, Deserial
             Ok(Response::UpdatePart(blob))
         }
         Response::MSG_ID_UPDATE_END => Ok(Response::UpdateEnd),
-        Response::MSG_ID_SETTINGS => match deserrialize_byte(buffer)? {
+        Response::MSG_ID_SETTINGS => match deserialize_byte(buffer)? {
             0 => Ok(Response::Settings(None)),
             1 => {
                 let battery_ignore = deserialize_bool(buffer)?;
@@ -204,7 +204,7 @@ fn deserialize_string(buffer: &mut Cursor<&[u8]>) -> Result<Box<str>, Deserializ
 
 /// unfinished
 fn deserialize_bool(buffer: &mut Cursor<&[u8]>) -> Result<bool, DeserializeError> {
-    match deserrialize_byte(buffer)? {
+    match deserialize_byte(buffer)? {
         0 => Ok(false),
         1 => Ok(true),
         other => Err(DeserializeError::IllegalBooleanValue(other)),
@@ -232,7 +232,7 @@ fn deserrialize_i8(buffer: &mut Cursor<&[u8]>) -> Result<i8, DeserializeError> {
 }
 
 /// unfinished
-fn deserrialize_byte(buffer: &mut Cursor<&[u8]>) -> Result<u8, DeserializeError> {
+fn deserialize_byte(buffer: &mut Cursor<&[u8]>) -> Result<u8, DeserializeError> {
     Ok(u8::from_be_bytes(read_n_bytes(buffer)?))
 }
 
