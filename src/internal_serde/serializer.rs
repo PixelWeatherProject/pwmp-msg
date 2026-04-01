@@ -1,6 +1,6 @@
 //! unfinished
 
-use super::BytesLength;
+use super::{BytesLength, OPTIONAL_VALUE_EXISTS, OPTIONAL_VALUE_VACANT};
 use crate::{request::Request, response::Response, version::Version, Message, MessageContent};
 use thiserror::Error;
 
@@ -51,9 +51,9 @@ pub fn serialize_request(req: Request, buffer: &mut Vec<u8>) -> Result<(), Seria
             buffer.push(humidity);
 
             match air_pressure {
-                None => buffer.push(0),
+                None => buffer.push(OPTIONAL_VALUE_VACANT),
                 Some(val) => {
-                    buffer.push(1);
+                    buffer.push(OPTIONAL_VALUE_EXISTS);
                     buffer.extend_from_slice(&val.to_be_bytes());
                 }
             }
@@ -123,9 +123,9 @@ pub fn serialize_response(res: Response, buffer: &mut Vec<u8>) -> Result<(), Ser
             buffer.push(Response::MSG_ID_SETTINGS);
 
             match node_settings {
-                None => buffer.push(0),
+                None => buffer.push(OPTIONAL_VALUE_VACANT),
                 Some(val) => {
-                    buffer.push(1);
+                    buffer.push(OPTIONAL_VALUE_EXISTS);
                     buffer.push(u8::from(val.battery_ignore));
                     buffer.push(u8::from(val.ota));
                     buffer.extend_from_slice(&val.sleep_time.to_be_bytes());

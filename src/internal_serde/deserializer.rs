@@ -1,6 +1,6 @@
 //! unfinished
 
-use super::BytesLength;
+use super::{BytesLength, OPTIONAL_VALUE_EXISTS, OPTIONAL_VALUE_VACANT};
 use crate::{
     mac::Mac, request::Request, response::Response, settings::NodeSettings, version::Version,
     Message,
@@ -100,8 +100,8 @@ fn deserialize_request(buffer: &mut Cursor<&[u8]>) -> Result<Request, Deserializ
             let temperature = deserialize_f32(buffer)?;
             let humidity = deserialize_byte(buffer)?;
             let air_pressure = match deserialize_byte(buffer)? {
-                0 => None,
-                1 => Some(deserialize_u16(buffer)?),
+                OPTIONAL_VALUE_VACANT => None,
+                OPTIONAL_VALUE_EXISTS => Some(deserialize_u16(buffer)?),
                 other => return Err(DeserializeError::IllegalOptionalIdentifier(other)),
             };
 
@@ -159,8 +159,8 @@ fn deserialize_response(buffer: &mut Cursor<&[u8]>) -> Result<Response, Deserial
         }
         Response::MSG_ID_UPDATE_END => Ok(Response::UpdateEnd),
         Response::MSG_ID_SETTINGS => match deserialize_byte(buffer)? {
-            0 => Ok(Response::Settings(None)),
-            1 => {
+            OPTIONAL_VALUE_VACANT => Ok(Response::Settings(None)),
+            OPTIONAL_VALUE_EXISTS => {
                 let battery_ignore = deserialize_bool(buffer)?;
                 let ota = deserialize_bool(buffer)?;
                 let sleep_time = deserialize_u16(buffer)?;
