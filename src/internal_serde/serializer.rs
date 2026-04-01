@@ -29,6 +29,8 @@ pub fn serialize(message: Message) -> Result<Box<[u8]>, SerializeError> {
 
 /// unfinished
 pub fn serialize_request(req: Request, buffer: &mut Vec<u8>) -> Result<(), SerializeError> {
+    buffer.put_u8(Message::MSG_ID_REQUEST);
+
     match req {
         Request::Ping => buffer.put_u8(Request::MSG_ID_PING),
         Request::Handshake { mac } => {
@@ -95,6 +97,8 @@ pub fn serialize_request(req: Request, buffer: &mut Vec<u8>) -> Result<(), Seria
 
 /// unfinished
 pub fn serialize_response(res: Response, buffer: &mut Vec<u8>) -> Result<(), SerializeError> {
+    buffer.put_u8(Message::MSG_ID_RESPONSE);
+
     match res {
         Response::Pong => buffer.put_u8(Response::MSG_ID_PONG),
         Response::Ok => buffer.put_u8(Response::MSG_ID_OK),
