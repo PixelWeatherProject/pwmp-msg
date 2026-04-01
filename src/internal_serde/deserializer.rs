@@ -20,6 +20,10 @@ pub enum DeserializeError {
     #[error("Buffer was exhausted while reading: {0}")]
     Exhausted(#[from] bytes::TryGetError),
 
+    /// There are still some bytes left in the buffer after deserialization
+    #[error("Unprocessed bytes left in the buffer")]
+    NotExhausted,
+
     /// Invalid message type identifier
     #[error("Invalid message type: {0}")]
     IllegalVariantIdentifier(u8),
@@ -70,6 +74,10 @@ pub fn deserialize(bytes: &[u8]) -> Result<Message, DeserializeError> {
         }
         _ => return Err(DeserializeError::IllegalVariantIdentifier(kind)),
     };
+
+    if buffer.has_remaining() {
+        return Err(DeserializeError::NotExhausted);
+    }
 
     Ok(message)
 }
