@@ -15,7 +15,7 @@ pub enum SerializeError {
 
 /// unfinished
 pub fn serialize(message: Message) -> Result<Box<[u8]>, SerializeError> {
-    let mut buffer = Vec::with_capacity(4);
+    let mut buffer = Vec::with_capacity(2);
 
     buffer.put_u32(message.id);
 
