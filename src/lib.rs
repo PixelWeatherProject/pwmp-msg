@@ -150,7 +150,7 @@ impl Message {
     /// ```
     #[must_use]
     pub fn deserialize(bytes: &[u8]) -> Option<Self> {
-        todo!()
+        internal_serde::deserialize(bytes).ok()
     }
 
     /// Returns a reference to the contained [`Request`].
