@@ -14,7 +14,10 @@ pub enum SerializeError {
 
 /// unfinished
 pub fn serialize(message: Message) -> Result<Box<[u8]>, SerializeError> {
-    let mut buffer = Vec::with_capacity(2);
+    // Theoretical ideal value is 8.
+    // MSG ID (4 bytes) + Req/Res type ID (1 byte) + Data (min. 1 byte) = 6 bytes
+    // 8 bytes sounds like a good balance - most message variants will not require extra allocs
+    let mut buffer = Vec::with_capacity(8);
 
     buffer.extend_from_slice(&message.id.to_be_bytes());
 
