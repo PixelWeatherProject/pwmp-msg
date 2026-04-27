@@ -53,10 +53,14 @@ pub enum Request {
     /// This will also cache the update on the server.
     UpdateCheck(Version),
 
-    /// Request a part of a firmware upgrade. The parameter is the maximum chunk size that shall be received.
+    /// Request a part of a firmware upgrade.
+    /// The parameter is the maximum chunk size that shall be received.
+    ///
+    /// The size type is intentionally [`u32`] to help prevent out-of-memory denial of service attacks.
+    /// While it's still possible to make a OOM attack, the server has a connection limit and a rate limit to help mitigate this.
     ///
     /// **The client must request an update check first before sending this request.**
-    NextUpdateChunk(usize),
+    NextUpdateChunk(u32),
 
     /// Report back about the updated firmware version.
     /// The parameter means whether this new firmware is working, or was bad, and the node has rolled back to a previous version.
