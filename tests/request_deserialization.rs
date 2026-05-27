@@ -24,18 +24,13 @@ generate_test!(
 );
 
 generate_test!(
-    can_deserialize_post_results,
-    Request::PostResults {
+    can_deserialize_post_measurements,
+    Request::PostMeasurements {
         temperature: f32::default(),
         humidity: 50,
         air_pressure: Some(u16::MAX),
-    }
-);
-
-generate_test!(
-    can_deserialize_post_stats,
-    Request::PostStats {
         battery: f32::default(),
+        cpu_temp: f32::default(),
         wifi_ssid: "ABC 123".into(),
         wifi_rssi: -15,
     }
