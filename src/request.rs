@@ -24,14 +24,22 @@ pub enum Request {
     PostMeasurements {
         /// Temperature
         temperature: Temperature,
+
         /// Humidity
         humidity: Humidity,
+
         /// Air pressure *(if supported by the node)*
         air_pressure: Option<AirPressure>,
+
         /// Node's battery voltage
         battery: BatteryVoltage,
+
+        /// CPU die temperature
+        cpu_temp: Temperature,
+
         /// ESSID of the wireless network
         wifi_ssid: Box<str>,
+
         /// RSSI *(signal quality)* of the connection to the wireless network in dBm *(decibel meters)*.
         /// Higher values (closer to 0) mean a better quality.
         wifi_rssi: Rssi,
