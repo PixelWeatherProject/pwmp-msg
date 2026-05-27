@@ -97,6 +97,25 @@ impl Message {
         }
     }
 
+    /// Get the schema version specified in the message.
+    ///
+    /// # Example
+    /// The following example creates message, which will default to [`COMPATIBLE_SCHEMA_VERSION`].
+    ///
+    /// ```rust
+    /// use pwmp_msg::{Message, response::Response, schemver::SchemaVersion, COMPATIBLE_SCHEMA_VERSION};
+    ///
+    /// let id = 1;
+    /// let response = Response::Pong;
+    /// let message = Message::new_response(response.clone(), id);
+    ///
+    /// assert_eq!(message.schema_version(), COMPATIBLE_SCHEMA_VERSION);
+    /// ```
+    #[must_use]
+    pub const fn schema_version(&self) -> schemver::SchemaVersion {
+        self.schema
+    }
+
     /// Serialize the message into raw bytes.
     ///
     /// # Example
