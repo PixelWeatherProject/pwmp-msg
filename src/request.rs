@@ -21,17 +21,13 @@ pub enum Request {
     },
 
     /// Post measurement results to the database.
-    PostResults {
+    PostMeasurements {
         /// Temperature
         temperature: Temperature,
         /// Humidity
         humidity: Humidity,
         /// Air pressure *(if supported by the node)*
         air_pressure: Option<AirPressure>,
-    },
-
-    /// Post node statistics to the database.
-    PostStats {
         /// Node's battery voltage
         battery: BatteryVoltage,
         /// ESSID of the wireless network
