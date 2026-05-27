@@ -10,11 +10,15 @@ pub mod aliases;
 pub mod mac;
 pub mod request;
 pub mod response;
+pub mod schemver;
 pub mod settings;
 pub mod version;
 
 /// Message ID type.
-pub type MsgId = u32;
+pub type MsgId = u8;
+
+/// Schema version used by the current version of this crate.
+pub const COMPATIBLE_SCHEMA_VERSION: schemver::SchemaVersion = schemver::SchemaVersion::V3_0_0;
 
 /// A Message object.
 /// Can either be a request or a response.
@@ -22,14 +26,17 @@ pub type MsgId = u32;
 pub struct Message {
     /// Unique ID of this message.
     ///
-    /// Reliability of the unsigned 32-bit integer ID:
-    /// - If two messages happen to have the same ID, as long as they're sent to two different clients, it's fine.
-    /// - The client and the server won't usually exchange many messages.
-    /// - If the client requests too many OTA update chunks, this might be problematic.
+    /// This ID is used to check if the message is **not** a duplicate.
+    /// Due to the limited amount of values, the client and the server implementations do not need
+    /// to keep track of every ID of every message. Technically only the ID of the previous message
+    /// needs to be remembered.
     ///
     /// The server and client should keep a short-term cache of the sent/received IDs
     /// to determinte if the same message hasn't been duplicated.
     id: MsgId,
+
+    /// Protocol schema version.
+    schema: schemver::SchemaVersion,
 
     /// Actual content of the message, which can be either a request or a response.
     content: MessageContent,
@@ -63,6 +70,7 @@ impl Message {
     pub const fn new_request(req: request::Request, id: MsgId) -> Self {
         Self {
             id,
+            schema: COMPATIBLE_SCHEMA_VERSION,
             content: MessageContent::Request(req),
         }
     }
@@ -84,6 +92,7 @@ impl Message {
     pub const fn new_response(res: response::Response, id: MsgId) -> Self {
         Self {
             id,
+            schema: COMPATIBLE_SCHEMA_VERSION,
             content: MessageContent::Response(res),
         }
     }

@@ -1,6 +1,6 @@
 //! Contains the definition of a response message, used to respond to requests.
 
-use crate::{settings::NodeSettings, version::Version};
+use crate::{schemver, settings::NodeSettings, version::Version};
 use derive_more::Debug;
 use serde::{Deserialize, Serialize};
 
@@ -27,6 +27,15 @@ pub enum Response {
 
     /// Kicked for stalling.
     Stalling,
+
+    /// Incompatible schema version.
+    IncompatibleSchema {
+        /// Schema version got from the sender.
+        got: schemver::SchemaVersion,
+
+        /// Schema version the receiver expected.
+        expected: schemver::SchemaVersion,
+    },
 
     /// No new firmware update is available.
     FirmwareUpToDate,
