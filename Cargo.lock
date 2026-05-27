@@ -369,7 +369,7 @@ dependencies = [
 
 [[package]]
 name = "pwmp-msg"
-version = "2.1.12"
+version = "3.0.0"
 dependencies = [
  "criterion",
  "derive_more",
