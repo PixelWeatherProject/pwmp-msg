@@ -37,23 +37,14 @@ generate_benchmark!(
 );
 
 generate_benchmark!(
-    benchmark_request_post_results_deserialization,
-    "Message(Request::PostResults)::deserialize",
+    benchmark_request_post_measurements_deserialization,
+    "Message(Request::PostMeasurements)::deserialize",
     Message::new_request(
-        bb!(Request::PostResults {
+        bb!(Request::PostMeasurements {
             temperature: bb!(45.78),
             humidity: bb!(45),
             air_pressure: bb!(Some(bb!(65520))),
-        }),
-        bb!(55)
-    )
-);
-
-generate_benchmark!(
-    benchmark_request_post_stats_deserialization,
-    "Message(Request::PostStats)::deserialize",
-    Message::new_request(
-        bb!(Request::PostStats {
+            cpu_temp: bb!(29.45),
             battery: bb!(4.20),
             wifi_ssid: bb!("Hello, World!".to_string().into_boxed_str()),
             wifi_rssi: bb!(-45),
@@ -115,8 +106,7 @@ criterion_group!(
     benchmark_request_ping_deserialization,
     benchmark_request_ping_deserialization,
     benchmark_request_handshake_deserialization,
-    benchmark_request_post_results_deserialization,
-    benchmark_request_post_stats_deserialization,
+    benchmark_request_post_measurements_deserialization,
     benchmark_request_send_notification_deserialization,
     benchmark_request_get_settings_deserialization,
     benchmark_request_update_check_deserialization,
