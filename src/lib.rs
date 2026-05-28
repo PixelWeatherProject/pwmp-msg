@@ -10,15 +10,11 @@ pub mod aliases;
 pub mod mac;
 pub mod request;
 pub mod response;
-pub mod schemver;
 pub mod settings;
 pub mod version;
 
 /// Message ID type.
 pub type MsgId = u8;
-
-/// Schema version used by the current version of this crate.
-pub const COMPATIBLE_SCHEMA_VERSION: schemver::SchemaVersion = schemver::SchemaVersion::V3_0_0;
 
 /// A Message object.
 /// Can either be a request or a response.
@@ -34,9 +30,6 @@ pub struct Message {
     /// The server and client should keep a short-term cache of the sent/received IDs
     /// to determinte if the same message hasn't been duplicated.
     id: MsgId,
-
-    /// Protocol schema version.
-    schema: schemver::SchemaVersion,
 
     /// Actual content of the message, which can be either a request or a response.
     content: MessageContent,
@@ -70,7 +63,6 @@ impl Message {
     pub const fn new_request(req: request::Request, id: MsgId) -> Self {
         Self {
             id,
-            schema: COMPATIBLE_SCHEMA_VERSION,
             content: MessageContent::Request(req),
         }
     }
@@ -92,28 +84,8 @@ impl Message {
     pub const fn new_response(res: response::Response, id: MsgId) -> Self {
         Self {
             id,
-            schema: COMPATIBLE_SCHEMA_VERSION,
             content: MessageContent::Response(res),
         }
-    }
-
-    /// Get the schema version specified in the message.
-    ///
-    /// # Example
-    /// The following example creates message, which will default to [`COMPATIBLE_SCHEMA_VERSION`].
-    ///
-    /// ```rust
-    /// use pwmp_msg::{Message, response::Response, schemver::SchemaVersion, COMPATIBLE_SCHEMA_VERSION};
-    ///
-    /// let id = 1;
-    /// let response = Response::Pong;
-    /// let message = Message::new_response(response.clone(), id);
-    ///
-    /// assert_eq!(message.schema_version(), COMPATIBLE_SCHEMA_VERSION);
-    /// ```
-    #[must_use]
-    pub const fn schema_version(&self) -> schemver::SchemaVersion {
-        self.schema
     }
 
     /// Serialize the message into raw bytes.
