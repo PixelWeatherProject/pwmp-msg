@@ -2,6 +2,10 @@
 //!
 //! Defines a very basic MAC Address data type used for storing and representing
 //! MAC adresses.
+//!
+//! ## Parsing
+//! You can parse a string as a `Mac` by using `from_str()`. Note that the parser
+//! expects double-padded octets, so for eg. `0:0:0:0:0:0` will fail, but `00:00:00:00:00:00` will work.
 
 use serde::{Deserialize, Serialize};
 use std::{
@@ -49,21 +53,23 @@ impl Mac {
 impl FromStr for Mac {
     type Err = MacParseError;
 
-    #[allow(clippy::cast_possible_truncation)]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.len() != MAC_STR_LEN {
             return Err(MacParseError);
         }
 
-        let split = s.split(':');
-        let mut mac = Self::new(0, 0, 0, 0, 0, 0);
+        let mut result = Self::default();
 
-        for (i, octet) in split.enumerate() {
-            let value = u8::from_str_radix(octet, 16)?;
-            mac[i] = value;
+        for (i, octet) in s.split(':').enumerate() {
+            if octet.len() != 2 || !octet.chars().all(|c| c.is_ascii_hexdigit()) || i > 5 {
+                return Err(MacParseError);
+            }
+
+            // SAFETY: The above checks ensure that `octet` is a valid HEX number.
+            result[i] = unsafe { u8::from_str_radix(octet, 16).unwrap_unchecked() };
         }
 
-        Ok(mac)
+        Ok(result)
     }
 }
 
