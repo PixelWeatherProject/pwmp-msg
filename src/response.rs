@@ -35,6 +35,7 @@ pub enum Response {
     UpdateAvailable(Version),
 
     /// Part of a firmware update.
+    #[serde(with = "serde_bytes")]
     UpdatePart(#[debug(skip)] Box<[u8]>),
 
     /// End of firmware update chunks.
