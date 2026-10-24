@@ -10,7 +10,7 @@ macro_rules! generate_test {
     ($test_name: ident, $req: expr) => {
         #[test]
         fn $test_name() {
-            let _ = Message::new_request($req, 0).serialize();
+            let _ = Message::new_request($req, 0).serialize().unwrap();
         }
     };
 }

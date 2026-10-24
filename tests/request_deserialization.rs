@@ -12,7 +12,7 @@ macro_rules! generate_test {
         fn $test_name() {
             let request: Request = $req;
             let original_message = Message::new_request(request, 1);
-            let serialized = original_message.clone().serialize();
+            let serialized = original_message.clone().serialize().unwrap();
             let deserialized = Message::deserialize(&serialized).unwrap();
 
             assert_eq!(original_message, deserialized);

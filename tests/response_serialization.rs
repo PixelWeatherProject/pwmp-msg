@@ -4,7 +4,7 @@ macro_rules! generate_test {
     ($test_name: ident, $res: expr) => {
         #[test]
         fn $test_name() {
-            let _ = Message::new_response($res, 0).serialize();
+            let _ = Message::new_response($res, 0).serialize().unwrap();
         }
     };
 }

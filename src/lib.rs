@@ -98,7 +98,7 @@ impl Message {
     /// let id = 1;
     /// let request = Request::GetSettings;
     /// let message = Message::new_request(request, id);
-    /// let bytes = message.serialize();
+    /// let bytes = message.serialize().unwrap();
     /// ```
     ///
     /// ```rust
@@ -107,7 +107,7 @@ impl Message {
     /// let id = 1;
     /// let response = Response::Ok;
     /// let message = Message::new_response(response, id);
-    /// let bytes = message.serialize();
+    /// let bytes = message.serialize().unwrap();
     /// ```
     ///
     /// # Errors
@@ -167,7 +167,7 @@ impl Message {
     /// let request = Request::GetSettings;
     /// let message = Message::new_request(request, id);
     ///
-    /// let bytes = message.clone().serialize();
+    /// let bytes = message.clone().serialize().unwrap();
     /// let original_message = Message::deserialize(&bytes).unwrap();
     ///
     /// assert_eq!(message, original_message);
@@ -180,7 +180,7 @@ impl Message {
     /// let response = Response::Ok;
     /// let message = Message::new_response(response, id);
     ///
-    /// let bytes = message.clone().serialize();
+    /// let bytes = message.clone().serialize().unwrap();
     /// let original_message = Message::deserialize(&bytes).unwrap();
     ///
     /// assert_eq!(message, original_message);

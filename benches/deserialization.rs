@@ -5,7 +5,7 @@ use std::hint::black_box;
 macro_rules! generate_benchmark {
     ($name: ident, $string_name: literal, $msg: expr) => {
         fn $name(c: &mut Criterion) {
-            let serialized = Message::serialize($msg);
+            let serialized = Message::serialize($msg).unwrap();
             c.bench_function($string_name, |b| {
                 b.iter(|| Message::deserialize(black_box(&serialized)))
             });
