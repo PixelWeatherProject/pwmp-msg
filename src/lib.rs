@@ -4,6 +4,7 @@
 //!
 //! This library contains the definitions of all possible messages in the PWMP.
 
+pub use postcard;
 use serde::{Deserialize, Serialize};
 
 pub mod aliases;
@@ -114,6 +115,49 @@ impl Message {
     #[must_use]
     pub fn serialize(self) -> Box<[u8]> {
         postcard::to_allocvec(&self).unwrap().into_boxed_slice()
+    }
+
+    /// Serialize the message into raw bytes, writing them to the specified buffer without allocating.
+    ///
+    /// This is similar to [`serialize()`](Self::serialize), but requires the caller
+    /// to provide a valid, large enough buffer.
+    ///
+    /// This may be useful for applications that repeatedly serialize messages.
+    /// It also returns a [`Result`], so you can handle errors, thus this method cannot
+    /// panic, unlike [`serialize()`](Self::serialize).
+    ///
+    /// # Examples
+    /// ```rust
+    /// use pwmp_msg::{Message, request::Request};
+    ///
+    /// let id = 1;
+    /// let request = Request::Ping;
+    /// let message = Message::new_request(request, id);
+    ///
+    /// let mut buffer = [0u8; 4];
+    /// let bytes = message.serialize_into(&mut buffer).unwrap();
+    ///
+    /// assert_eq!(bytes, &[1, 0, 0]);
+    /// ```
+    ///
+    /// In the following example, the buffer is too small to contain the data, so it fails:
+    /// ```rust
+    /// use pwmp_msg::{Message, request::Request};
+    ///
+    /// let id = 1;
+    /// let request = Request::SendNotification("Hello, world!".into());
+    /// let message = Message::new_request(request, id);
+    ///
+    /// let mut buffer = [0u8; 4];
+    /// let error = message.serialize_into(&mut buffer).unwrap_err();
+    ///
+    /// assert_eq!(error.to_string(), "The serialize buffer is full");
+    /// ```
+    ///
+    /// # Errors
+    /// Returns a [`postcard::Result`], which will contain an error if the serialization fails.
+    pub fn serialize_into(self, buffer: &mut [u8]) -> postcard::Result<&mut [u8]> {
+        postcard::to_slice(&self, buffer)
     }
 
     /// Deserialize a message from raw bytes.
