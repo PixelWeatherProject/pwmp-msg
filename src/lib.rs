@@ -110,11 +110,10 @@ impl Message {
     /// let bytes = message.serialize();
     /// ```
     ///
-    /// # Panics
-    /// This will panic if the message could not be serialized.
-    #[must_use]
-    pub fn serialize(self) -> Box<[u8]> {
-        postcard::to_allocvec(&self).unwrap().into_boxed_slice()
+    /// # Errors
+    /// Returns a [`postcard::Result`], which will contain an error if the serialization fails.
+    pub fn serialize(self) -> postcard::Result<Box<[u8]>> {
+        postcard::to_allocvec(&self).map(Vec::into_boxed_slice)
     }
 
     /// Serialize the message into raw bytes, writing them to the specified buffer without allocating.
@@ -123,8 +122,6 @@ impl Message {
     /// to provide a valid, large enough buffer.
     ///
     /// This may be useful for applications that repeatedly serialize messages.
-    /// It also returns a [`Result`], so you can handle errors, thus this method cannot
-    /// panic, unlike [`serialize()`](Self::serialize).
     ///
     /// # Examples
     /// ```rust
