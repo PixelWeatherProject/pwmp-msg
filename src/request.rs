@@ -10,11 +10,17 @@ use serde::{Deserialize, Serialize};
 /// A request message used by nodes to ask the PWMP server to perform an operation.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub enum Request {
-    /// Ask to server to authorize the node using it's MAC address.
-    Handshake {
+    /// Initial request for the server to initialize the session.
+    Hello {
         #[allow(clippy::doc_markdown)]
         /// The node's MAC address. This address should be that of the WiFi interface.
         mac: Mac,
+
+        /// Firmware version.
+        os_version: Version,
+
+        /// Firmware version extension (may contain Git hash, build type - debug/release, etc.)
+        os_version_ext: Option<Box<str>>,
     },
 
     /// Post measurement results to the database.
