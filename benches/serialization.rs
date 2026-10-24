@@ -17,17 +17,13 @@ macro_rules! generate_benchmark {
 }
 
 generate_benchmark!(
-    benchmark_request_ping_serialization,
-    "Message(Request::Ping)::serialize",
-    Message::new_request(Request::Ping, 55)
-);
-
-generate_benchmark!(
-    benchmark_request_handshake_serialization,
-    "Message(Request::Handshake)::serialize",
+    benchmark_request_hello_serialization,
+    "Message(Request::Hello)::serialize",
     Message::new_request(
-        Request::Handshake {
-            mac: Mac::new(0, 1, 2, 3, 4, 5)
+        Request::Hello {
+            mac: Mac::new(0, 1, 2, 3, 4, 5),
+            os_version: Version::new(1, 2, 3),
+            os_version_ext: Some("feedb33f+release".into())
         },
         55
     )
@@ -38,11 +34,11 @@ generate_benchmark!(
     "Message(Request::PostMeasurements)::serialize",
     Message::new_request(
         Request::PostMeasurements {
-            temperature: 45.78,
+            temperature: 457,
             humidity: 45,
             air_pressure: Some(65520),
-            cpu_temp: 27.12,
-            battery: 4.20,
+            cpu_temp: 271,
+            battery: 4200,
             wifi_ssid: "Hello, World!".into(),
             wifi_rssi: -45,
         },
@@ -88,8 +84,7 @@ generate_benchmark!(
 
 criterion_group!(
     benches,
-    benchmark_request_ping_serialization,
-    benchmark_request_handshake_serialization,
+    benchmark_request_hello_serialization,
     benchmark_request_post_measurements_serialization,
     benchmark_request_send_notification_serialization,
     benchmark_request_get_settings_serialization,

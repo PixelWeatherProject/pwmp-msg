@@ -54,7 +54,7 @@ impl Message {
     /// use pwmp_msg::{Message, request::Request};
     ///
     /// let id = 1;
-    /// let request = Request::Ping;
+    /// let request = Request::GetSettings;
     /// let message = Message::new_request(request.clone(), id);
     ///
     /// assert_eq!(message.id(), id);
@@ -75,7 +75,7 @@ impl Message {
     /// use pwmp_msg::{Message, response::Response};
     ///
     /// let id = 1;
-    /// let response = Response::Pong;
+    /// let response = Response::Ok;
     /// let message = Message::new_response(response.clone(), id);
     ///
     /// assert_eq!(message.id(), id);
@@ -96,7 +96,7 @@ impl Message {
     /// use pwmp_msg::{Message, request::Request};
     ///
     /// let id = 1;
-    /// let request = Request::Ping;
+    /// let request = Request::GetSettings;
     /// let message = Message::new_request(request, id);
     /// let bytes = message.serialize();
     /// ```
@@ -105,7 +105,7 @@ impl Message {
     /// use pwmp_msg::{Message, response::Response};
     ///
     /// let id = 1;
-    /// let response = Response::Pong;
+    /// let response = Response::Ok;
     /// let message = Message::new_response(response, id);
     /// let bytes = message.serialize();
     /// ```
@@ -131,13 +131,13 @@ impl Message {
     /// use pwmp_msg::{Message, request::Request};
     ///
     /// let id = 1;
-    /// let request = Request::Ping;
+    /// let request = Request::GetSettings;
     /// let message = Message::new_request(request, id);
     ///
     /// let mut buffer = [0u8; 4];
     /// let bytes = message.serialize_into(&mut buffer).unwrap();
     ///
-    /// assert_eq!(bytes, &[1, 0, 0]);
+    /// assert_eq!(bytes, &[1, 0, 4]);
     /// ```
     ///
     /// In the following example, the buffer is too small to contain the data, so it fails:
@@ -167,7 +167,7 @@ impl Message {
     /// use pwmp_msg::{Message, request::Request};
     ///
     /// let id = 1;
-    /// let request = Request::Ping;
+    /// let request = Request::GetSettings;
     /// let message = Message::new_request(request, id);
     ///
     /// let bytes = message.clone().serialize();
@@ -180,7 +180,7 @@ impl Message {
     /// use pwmp_msg::{Message, response::Response};
     ///
     /// let id = 1;
-    /// let response = Response::Pong;
+    /// let response = Response::Ok;
     /// let message = Message::new_response(response, id);
     ///
     /// let bytes = message.clone().serialize();
@@ -200,7 +200,7 @@ impl Message {
     /// use pwmp_msg::{Message, request::Request};
     ///
     /// let id = 1;
-    /// let original_request = Request::Ping;
+    /// let original_request = Request::GetSettings;
     /// let message = Message::new_request(original_request.clone(), id);
     /// let wrapped_request = message.request();
     ///
@@ -211,7 +211,7 @@ impl Message {
     /// use pwmp_msg::{Message, response::Response};
     ///
     /// let id = 1;
-    /// let response = Response::Pong;
+    /// let response = Response::Ok;
     /// let message = Message::new_response(response, id);
     ///
     /// assert_eq!(message.request(), None);
@@ -232,7 +232,7 @@ impl Message {
     /// use pwmp_msg::{Message, response::Response};
     ///
     /// let id = 1;
-    /// let original_response = Response::Pong;
+    /// let original_response = Response::Ok;
     /// let message = Message::new_response(original_response.clone(), id);
     /// let wrapped_response = message.response();
     ///
@@ -243,7 +243,7 @@ impl Message {
     /// use pwmp_msg::{Message, request::Request};
     ///
     /// let id = 1;
-    /// let request = Request::Ping;
+    /// let request = Request::GetSettings;
     /// let message = Message::new_request(request, id);
     ///
     /// assert_eq!(message.response(), None);
@@ -263,7 +263,7 @@ impl Message {
     /// use pwmp_msg::{Message, request::Request};
     ///
     /// let id = 1;
-    /// let original_request = Request::Ping;
+    /// let original_request = Request::GetSettings;
     /// let message = Message::new_request(original_request.clone(), id);
     /// let wrapped_request = message.take_request();
     ///
@@ -274,7 +274,7 @@ impl Message {
     /// use pwmp_msg::{Message, response::Response};
     ///
     /// let id = 1;
-    /// let response = Response::Pong;
+    /// let response = Response::Ok;
     /// let message = Message::new_response(response, id);
     ///
     /// assert_eq!(message.take_request(), None);
@@ -294,7 +294,7 @@ impl Message {
     /// use pwmp_msg::{Message, response::Response};
     ///
     /// let id = 1;
-    /// let original_response = Response::Pong;
+    /// let original_response = Response::Ok;
     /// let message = Message::new_response(original_response.clone(), id);
     /// let wrapped_response = message.take_response();
     ///
@@ -305,7 +305,7 @@ impl Message {
     /// use pwmp_msg::{Message, request::Request};
     ///
     /// let id = 1;
-    /// let request = Request::Ping;
+    /// let request = Request::GetSettings;
     /// let message = Message::new_request(request, id);
     ///
     /// assert_eq!(message.take_response(), None);
@@ -325,7 +325,7 @@ impl Message {
     /// use pwmp_msg::{Message, request::Request};
     ///
     /// let id = 1;
-    /// let request = Request::Ping;
+    /// let request = Request::GetSettings;
     /// let message = Message::new_request(request, id);
     ///
     /// assert_eq!(message.id(), id);
@@ -335,7 +335,7 @@ impl Message {
     /// use pwmp_msg::{Message, response::Response};
     ///
     /// let id = 1;
-    /// let response = Response::Pong;
+    /// let response = Response::Ok;
     /// let message = Message::new_response(response, id);
     ///
     /// assert_eq!(message.id(), id);

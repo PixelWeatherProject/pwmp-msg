@@ -1,4 +1,10 @@
-use pwmp_msg::{mac::Mac, request::Request, version::Version, Message};
+use pwmp_msg::{
+    aliases::{BatteryVoltage, Temperature},
+    mac::Mac,
+    request::Request,
+    version::Version,
+    Message,
+};
 
 macro_rules! generate_test {
     ($test_name: ident, $req: expr) => {
@@ -14,23 +20,23 @@ macro_rules! generate_test {
     };
 }
 
-generate_test!(can_deserialize_ping, Request::Ping);
-
 generate_test!(
     can_deserialize_hello,
-    Request::Handshake {
+    Request::Hello {
         mac: Mac::new(0, 1, 2, 3, 4, 5),
+        os_version: Version::default(),
+        os_version_ext: Some("feedb33f+release".into())
     }
 );
 
 generate_test!(
     can_deserialize_post_measurements,
     Request::PostMeasurements {
-        temperature: f32::default(),
+        temperature: Temperature::default(),
         humidity: 50,
         air_pressure: Some(u16::MAX),
-        battery: f32::default(),
-        cpu_temp: f32::default(),
+        battery: BatteryVoltage::default(),
+        cpu_temp: Temperature::default(),
         wifi_ssid: "ABC 123".into(),
         wifi_rssi: -15,
     }

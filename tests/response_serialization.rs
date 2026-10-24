@@ -9,8 +9,6 @@ macro_rules! generate_test {
     };
 }
 
-generate_test!(can_serialize_pong, Response::Pong);
-
 generate_test!(can_serialize_ok, Response::Ok);
 
 generate_test!(can_serialize_reject, Response::Reject);
