@@ -45,6 +45,17 @@ pub enum Request {
         wifi_rssi: Rssi,
     },
 
+    /// Post diagnostic artifact.
+    PostDiagnosticsArtifact {
+        /// Type of artifact.
+        kind: Box<str>,
+
+        /// Artifact content.
+        ///
+        /// This could be binary data, or a string.
+        content: Box<[u8]>,
+    },
+
     /// Store a notification in the database. These can be read by other applications.
     ///
     /// Notifications are usually used to inform about low battery status.
