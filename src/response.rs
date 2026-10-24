@@ -7,9 +7,6 @@ use std::fmt::{self, Debug};
 /// A response message used by the PWMP server to respond to [`Request`](crate::request::Request)s.
 #[derive(Serialize, Deserialize, PartialEq, Eq, Clone, Hash)]
 pub enum Response {
-    /// A response message to [`Request::Ping`](crate::request::Request::Ping).
-    Pong,
-
     /// Indicate a successfully processed request. This is usually used as a response to `Request::Post*` messages.
     Ok,
 

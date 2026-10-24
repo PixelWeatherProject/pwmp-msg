@@ -10,9 +10,6 @@ use serde::{Deserialize, Serialize};
 /// A request message used by nodes to ask the PWMP server to perform an operation.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub enum Request {
-    /// Used to check if the server is alive.
-    Ping,
-
     /// Ask to server to authorize the node using it's MAC address.
     Handshake {
         #[allow(clippy::doc_markdown)]
