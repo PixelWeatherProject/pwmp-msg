@@ -1,11 +1,11 @@
 //! Contains the definition of a response message, used to respond to requests.
 
 use crate::{settings::NodeSettings, version::Version};
-use derive_more::Debug;
 use serde::{Deserialize, Serialize};
+use std::fmt::{self, Debug};
 
 /// A response message used by the PWMP server to respond to [`Request`](crate::request::Request)s.
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Hash)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Clone, Hash)]
 pub enum Response {
     /// A response message to [`Request::Ping`](crate::request::Request::Ping).
     Pong,
@@ -36,7 +36,7 @@ pub enum Response {
 
     /// Part of a firmware update.
     #[serde(with = "serde_bytes")]
-    UpdatePart(#[debug(skip)] Box<[u8]>),
+    UpdatePart(Box<[u8]>),
 
     /// End of firmware update chunks.
     UpdateEnd,
@@ -64,5 +64,26 @@ impl Response {
                 | Self::InternalServerError
                 | Self::Stalling
         )
+    }
+}
+
+impl Debug for Response {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Pong => f.write_str("Pong"),
+            Self::Ok => f.write_str("Ok"),
+            Self::Reject => f.write_str("Reject"),
+            Self::InvalidRequest => f.write_str("InvalidRequest"),
+            Self::RateLimitExceeded => f.write_str("RateLimitExceeded"),
+            Self::InternalServerError => f.write_str("InternalServerError"),
+            Self::Stalling => f.write_str("Stalling"),
+            Self::FirmwareUpToDate => f.write_str("FirmwareUpToDate"),
+            Self::UpdateAvailable(version) => {
+                f.debug_tuple("UpdateAvailable").field(version).finish()
+            }
+            Self::UpdatePart(data) => write!(f, "UpdatePart([{} bytes])", data.len()),
+            Self::UpdateEnd => f.write_str("UpdateEnd"),
+            Self::Settings(settings) => f.debug_tuple("Settings").field(settings).finish(),
+        }
     }
 }
