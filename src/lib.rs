@@ -113,7 +113,7 @@ impl Message {
     /// This will panic if the message could not be serialized.
     #[must_use]
     pub fn serialize(self) -> Box<[u8]> {
-        postcard::to_stdvec(&self).unwrap().into_boxed_slice()
+        postcard::to_allocvec(&self).unwrap().into_boxed_slice()
     }
 
     /// Deserialize a message from raw bytes.
