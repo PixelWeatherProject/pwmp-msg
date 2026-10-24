@@ -67,7 +67,6 @@ impl Response {
 impl Debug for Response {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Pong => f.write_str("Pong"),
             Self::Ok => f.write_str("Ok"),
             Self::Reject => f.write_str("Reject"),
             Self::InvalidRequest => f.write_str("InvalidRequest"),
