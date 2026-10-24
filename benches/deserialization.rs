@@ -104,13 +104,10 @@ generate_benchmark!(
 criterion_group!(
     benches,
     benchmark_request_ping_deserialization,
-    benchmark_request_ping_deserialization,
     benchmark_request_handshake_deserialization,
     benchmark_request_post_measurements_deserialization,
     benchmark_request_send_notification_deserialization,
     benchmark_request_get_settings_deserialization,
-    benchmark_request_update_check_deserialization,
-    benchmark_request_send_notification_deserialization,
     benchmark_request_update_check_deserialization,
     benchmark_request_next_update_chunk_deserialization,
     benchmark_request_report_fw_update_deserialization,

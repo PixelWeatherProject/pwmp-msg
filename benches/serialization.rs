@@ -1,4 +1,4 @@
-use criterion::{criterion_group, criterion_main, Criterion};
+use criterion::{criterion_group, criterion_main, BatchSize, Criterion};
 use pwmp_msg::{mac::Mac, request::Request, version::Version, Message};
 use std::hint::black_box;
 
@@ -11,7 +11,13 @@ macro_rules! bb {
 macro_rules! generate_benchmark {
     ($name: ident, $string_name: literal, $msg: expr) => {
         fn $name(c: &mut Criterion) {
-            c.bench_function($string_name, |b| b.iter(|| Message::serialize(bb!($msg))));
+            c.bench_function($string_name, |b| {
+                b.iter_batched(
+                    || $msg,
+                    |msg| Message::serialize(bb!(msg)),
+                    BatchSize::SmallInput,
+                )
+            });
         }
     };
 }
@@ -101,13 +107,10 @@ generate_benchmark!(
 criterion_group!(
     benches,
     benchmark_request_ping_serialization,
-    benchmark_request_ping_serialization,
     benchmark_request_handshake_serialization,
     benchmark_request_post_measurements_serialization,
     benchmark_request_send_notification_serialization,
     benchmark_request_get_settings_serialization,
-    benchmark_request_update_check_serialization,
-    benchmark_request_send_notification_serialization,
     benchmark_request_update_check_serialization,
     benchmark_request_next_update_chunk_serialization,
     benchmark_request_report_fw_update_serialization,
