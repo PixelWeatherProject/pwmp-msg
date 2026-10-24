@@ -1,7 +1,9 @@
 //! Type aliases.
 
-/// A fixed-precision decimal number that represents temperature in *Celsius*.
-pub type Temperature = f32;
+/// Temperature expressed in units of decicelsius (often called a decidegree Celsius).
+///
+/// _0.1°dC is equivalent to 0.1°C_
+pub type Temperature = i16;
 
 /// Relative humidity represented as percentage (*%*).
 pub type Humidity = u8;
@@ -9,8 +11,10 @@ pub type Humidity = u8;
 /// Air pressure represented in hecto-Pascal (*hPa*).
 pub type AirPressure = u16;
 
-/// A fixed-precision decimal number that represents voltage (*V*).
-pub type BatteryVoltage = f32;
+/// Voltage expressed in units of millivolts (_mV_).
+///
+/// _1mV is equivalent of 0.001V_
+pub type BatteryVoltage = i16;
 
-/// Signal strength represented in decibel-milliwatts (*dBm*).
+/// Signal strength represented in decibel-milliwatts (_dBm_).
 pub type Rssi = i8;

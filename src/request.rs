@@ -8,7 +8,7 @@ use crate::{
 use serde::{Deserialize, Serialize};
 
 /// A request message used by nodes to ask the PWMP server to perform an operation.
-#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub enum Request {
     /// Initial request for the server to initialize the session.
     Hello {
