@@ -14,7 +14,7 @@ pub type AirPressure = u16;
 /// Voltage expressed in units of millivolts (_mV_).
 ///
 /// _1mV is equivalent of 0.001V_
-pub type BatteryVoltage = i16;
+pub type BatteryVoltage = u16;
 
 /// Signal strength represented in decibel-milliwatts (_dBm_).
 pub type Rssi = i8;
