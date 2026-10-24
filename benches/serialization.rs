@@ -2,19 +2,13 @@ use criterion::{criterion_group, criterion_main, BatchSize, Criterion};
 use pwmp_msg::{mac::Mac, request::Request, version::Version, Message};
 use std::hint::black_box;
 
-macro_rules! bb {
-    ($e: expr) => {
-        black_box($e)
-    };
-}
-
 macro_rules! generate_benchmark {
     ($name: ident, $string_name: literal, $msg: expr) => {
         fn $name(c: &mut Criterion) {
             c.bench_function($string_name, |b| {
                 b.iter_batched(
                     || $msg,
-                    |msg| Message::serialize(bb!(msg)),
+                    |msg| Message::serialize(black_box(msg)),
                     BatchSize::SmallInput,
                 )
             });
@@ -25,17 +19,17 @@ macro_rules! generate_benchmark {
 generate_benchmark!(
     benchmark_request_ping_serialization,
     "Message(Request::Ping)::serialize",
-    Message::new_request(bb!(Request::Ping), bb!(55))
+    Message::new_request(Request::Ping, 55)
 );
 
 generate_benchmark!(
     benchmark_request_handshake_serialization,
     "Message(Request::Handshake)::serialize",
     Message::new_request(
-        bb!(Request::Handshake {
-            mac: bb!(Mac::new(bb!(0), bb!(1), bb!(2), bb!(3), bb!(4), bb!(5)))
-        }),
-        bb!(55)
+        Request::Handshake {
+            mac: Mac::new(0, 1, 2, 3, 4, 5)
+        },
+        55
     )
 );
 
@@ -43,65 +37,53 @@ generate_benchmark!(
     benchmark_request_post_measurements_serialization,
     "Message(Request::PostMeasurements)::serialize",
     Message::new_request(
-        bb!(Request::PostMeasurements {
-            temperature: bb!(45.78),
-            humidity: bb!(45),
-            air_pressure: bb!(Some(bb!(65520))),
-            cpu_temp: bb!(27.12),
-            battery: bb!(4.20),
-            wifi_ssid: bb!("Hello, World!".to_string().into_boxed_str()),
-            wifi_rssi: bb!(-45),
-        }),
-        bb!(55)
+        Request::PostMeasurements {
+            temperature: 45.78,
+            humidity: 45,
+            air_pressure: Some(65520),
+            cpu_temp: 27.12,
+            battery: 4.20,
+            wifi_ssid: "Hello, World!".into(),
+            wifi_rssi: -45,
+        },
+        55
     )
 );
 
 generate_benchmark!(
     benchmark_request_send_notification_serialization,
     "Message(Request::SendNotification)::serialize",
-    Message::new_request(
-        bb!(Request::SendNotification(bb!("Hello, World!"
-            .to_string()
-            .into_boxed_str()))),
-        bb!(55)
-    )
+    Message::new_request(Request::SendNotification("Hello, World!".into()), 55)
 );
 
 generate_benchmark!(
     benchmark_request_get_settings_serialization,
     "Message(Request::GetSettings)::serialize",
-    Message::new_request(bb!(Request::GetSettings), bb!(55))
+    Message::new_request(Request::GetSettings, 55)
 );
 
 generate_benchmark!(
     benchmark_request_update_check_serialization,
     "Message(Request::UpdateCheck)::serialize",
-    Message::new_request(
-        bb!(Request::UpdateCheck(bb!(Version::new(
-            bb!(5),
-            bb!(4),
-            bb!(7)
-        )))),
-        bb!(55)
-    )
+    Message::new_request(Request::UpdateCheck(Version::new(5, 4, 7)), 55)
 );
 
 generate_benchmark!(
     benchmark_request_next_update_chunk_serialization,
     "Message(Request::NextUpdateChunk)::serialize",
-    Message::new_request(bb!(Request::NextUpdateChunk(bb!(128_000_000))), bb!(55))
+    Message::new_request(Request::NextUpdateChunk(128_000_000), 55)
 );
 
 generate_benchmark!(
     benchmark_request_report_fw_update_serialization,
     "Message(Request::ReportFirmwareUpdate)::serialize",
-    Message::new_request(bb!(Request::ReportFirmwareUpdate(bb!(true))), bb!(55))
+    Message::new_request(Request::ReportFirmwareUpdate(true), 55)
 );
 
 generate_benchmark!(
     benchmark_request_bye_serialization,
     "Message(Request::Bye)::serialize",
-    Message::new_request(bb!(Request::Bye), bb!(55))
+    Message::new_request(Request::Bye, 55)
 );
 
 criterion_group!(
