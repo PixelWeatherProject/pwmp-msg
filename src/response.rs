@@ -43,6 +43,9 @@ pub enum Response {
 
     /// Node settings.
     Settings(Option<NodeSettings>),
+
+    /// UNIX epoch time.
+    EpochTime(u64),
 }
 
 impl Response {
@@ -84,6 +87,7 @@ impl Debug for Response {
             Self::UpdatePart(data) => write!(f, "UpdatePart([{} bytes])", data.len()),
             Self::UpdateEnd => f.write_str("UpdateEnd"),
             Self::Settings(settings) => f.debug_tuple("Settings").field(settings).finish(),
+            Self::EpochTime(epoch) => f.debug_tuple("EpochTime").field(epoch).finish(),
         }
     }
 }

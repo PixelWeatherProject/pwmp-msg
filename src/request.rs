@@ -53,6 +53,9 @@ pub enum Request {
     /// Retrieve the node's settings from the database.
     GetSettings,
 
+    /// Get the current UNIX epoch.
+    GetDateTime,
+
     /// Check for a firmware update.
     /// This will also cache the update on the server.
     UpdateCheck(Version),
