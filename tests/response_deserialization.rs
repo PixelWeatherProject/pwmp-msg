@@ -40,6 +40,7 @@ generate_test!(
         ota: true,
         sleep_time: 16,
         sbop: false,
-        mute_notifications: true
+        mute_notifications: true,
+        diagnostics: true
     }))
 );

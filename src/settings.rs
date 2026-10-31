@@ -21,6 +21,9 @@ pub struct NodeSettings {
 
     /// Whether the node is allowed to send notifications.
     pub mute_notifications: bool,
+
+    /// Whether the node should send diagnostic data.
+    pub diagnostics: bool,
 }
 
 impl NodeSettings {
@@ -59,6 +62,7 @@ impl NodeSettings {
             sleep_time: 60,
             sbop: true,
             mute_notifications: false,
+            diagnostics: false,
         }
     }
 }
