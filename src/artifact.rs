@@ -54,6 +54,12 @@ impl From<String> for Artifact {
     }
 }
 
+impl From<Box<str>> for Artifact {
+    fn from(value: Box<str>) -> Self {
+        Self::String(value)
+    }
+}
+
 impl From<&str> for Artifact {
     fn from(value: &str) -> Self {
         Self::String(value.into())
