@@ -13,6 +13,26 @@ pub enum Artifact {
     Blob(Box<[u8]>),
 }
 
+impl Artifact {
+    /// Returns whether the artifact contains no data.
+    #[must_use]
+    pub const fn is_empty(&self) -> bool {
+        match self {
+            Self::Blob(b) => b.is_empty(),
+            Self::String(s) => s.is_empty(),
+        }
+    }
+
+    /// Returns the length of the data held by the artifact.
+    #[must_use]
+    pub const fn len(&self) -> usize {
+        match self {
+            Self::Blob(b) => b.len(),
+            Self::String(s) => s.len(),
+        }
+    }
+}
+
 impl std::fmt::Debug for Artifact {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
