@@ -9,6 +9,7 @@ pub enum Artifact {
     String(Box<str>),
 
     /// A blob of bytes.
+    #[serde(with = "serde_bytes")]
     Blob(Box<[u8]>),
 }
 
