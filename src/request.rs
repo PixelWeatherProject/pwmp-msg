@@ -2,6 +2,7 @@
 
 use crate::{
     aliases::{AirPressure, BatteryVoltage, Humidity, Rssi, Temperature},
+    artifact::Artifact,
     mac::Mac,
     version::Version,
 };
@@ -54,9 +55,7 @@ pub enum Request {
         kind: Box<str>,
 
         /// Artifact content.
-        ///
-        /// This could be binary data, or a string.
-        content: Box<[u8]>,
+        content: Artifact,
     },
 
     /// Store a notification in the database. These can be read by other applications.

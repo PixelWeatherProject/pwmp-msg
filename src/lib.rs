@@ -8,6 +8,7 @@ pub use postcard;
 use serde::{Deserialize, Serialize};
 
 pub mod aliases;
+pub mod artifact;
 pub mod mac;
 pub mod request;
 pub mod response;
