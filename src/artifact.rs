@@ -36,8 +36,11 @@ impl Artifact {
 impl std::fmt::Debug for Artifact {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::String(value) => formatter.debug_tuple("String").field(value).finish(),
-            Self::Blob(value) => write!(formatter, "Blob(`[{} bytes]`)", value.len()),
+            Self::String(value) if value.len() <= 32 => {
+                formatter.debug_tuple("String").field(value).finish()
+            }
+            Self::String(value) => write!(formatter, "String([{} chars])", value.len()),
+            Self::Blob(value) => write!(formatter, "Blob([{} bytes])", value.len()),
         }
     }
 }
@@ -75,5 +78,31 @@ impl From<&[u8]> for Artifact {
 impl<const N: usize> From<&[u8; N]> for Artifact {
     fn from(value: &[u8; N]) -> Self {
         Self::from(&value[..])
+    }
+}
+
+#[cfg(test)]
+mod _tests {
+    use super::Artifact;
+
+    #[test]
+    fn debug_print() {
+        // short string
+        assert_eq!(
+            format!("{:?}", Artifact::from("Hello, World!")),
+            String::from("String(\"Hello, World!\")")
+        );
+
+        // long string
+        assert_eq!(
+            format!("{:?}", Artifact::from("Hello, World! This is now longer!")),
+            String::from("String([33 chars])")
+        );
+
+        // blob
+        assert_eq!(
+            format!("{:?}", Artifact::from(&[0xFF, 0xAA])),
+            String::from("Blob([2 bytes])")
+        );
     }
 }
