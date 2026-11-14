@@ -65,3 +65,15 @@ impl From<&str> for Artifact {
         Self::String(value.into())
     }
 }
+
+impl From<&[u8]> for Artifact {
+    fn from(value: &[u8]) -> Self {
+        Self::Blob(value.into())
+    }
+}
+
+impl<const N: usize> From<&[u8; N]> for Artifact {
+    fn from(value: &[u8; N]) -> Self {
+        Self::from(&value[..])
+    }
+}
