@@ -24,7 +24,7 @@ pub struct MeasurementCollection {
 }
 
 /// A historic measurement data snapshot, which contains a [`MeasurementCollection`] and a timestamp (unix epoch).
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct HistoricMeasurement {
     /// Measurement data
     collection: MeasurementCollection,
