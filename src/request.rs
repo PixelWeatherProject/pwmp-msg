@@ -5,6 +5,7 @@ use crate::{
     mac::Mac,
     measurement::{HistoricMeasurement, MeasurementCollection},
     version::Version,
+    wlan_stats::WiFiStats,
 };
 use serde::{Deserialize, Serialize};
 
@@ -25,10 +26,23 @@ pub enum Request {
     },
 
     /// Post measurement results to the database.
-    PostMeasurements(MeasurementCollection),
+    PostMeasurements {
+        /// Sensor measurements.
+        measurements: MeasurementCollection,
 
-    /// Post historic measurement results to the database.
-    PostHistoricMeasurements(Box<[HistoricMeasurement]>),
+        /// Wi-Fi statistics.
+        wifi_stats: WiFiStats,
+    },
+
+    /// Post historical measurements to the database.
+    PostHistoricMeasurements {
+        /// Sensor measurements.
+        measurements: Box<[HistoricMeasurement]>,
+
+        /// Wi-Fi statistics from the current run.
+        /// Historical stats are not available.
+        wifi_stats: WiFiStats,
+    },
 
     /// Post diagnostic artifact.
     PostDiagnosticsArtifact {

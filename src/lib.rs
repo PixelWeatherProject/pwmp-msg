@@ -16,6 +16,7 @@ pub mod request;
 pub mod response;
 pub mod settings;
 pub mod version;
+pub mod wlan_stats;
 
 /// Message ID type.
 pub type MsgId = u8;

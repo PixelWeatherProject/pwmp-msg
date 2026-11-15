@@ -1,14 +1,11 @@
 //! Module for the `MeasurementColection` and helper types.
 
-use crate::{
-    aliases::{AirPressure, BatteryVoltage, Humidity, Rssi, Temperature},
-    essid::WifiEssid,
-};
+use crate::aliases::{AirPressure, BatteryVoltage, Humidity, Temperature};
 use serde::{Deserialize, Serialize};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// A complete measurement data snapshot.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct MeasurementCollection {
     /// Temperature
     pub temperature: Temperature,
@@ -24,13 +21,6 @@ pub struct MeasurementCollection {
 
     /// CPU die temperature
     pub cpu_temp: Temperature,
-
-    /// ESSID of the wireless network
-    pub wifi_ssid: WifiEssid,
-
-    /// RSSI *(signal quality)* of the connection to the wireless network in dBm *(decibel meters)*.
-    /// Higher values (closer to 0) mean a better quality.
-    pub wifi_rssi: Rssi,
 }
 
 /// A historic measurement data snapshot, which contains a [`MeasurementCollection`] and a timestamp (unix epoch).
@@ -113,8 +103,6 @@ impl MeasurementCollection {
             air_pressure: None,
             battery: 0,
             cpu_temp: 0,
-            wifi_ssid: WifiEssid::const_new(),
-            wifi_rssi: 0,
         }
     }
 }
