@@ -1,5 +1,7 @@
 use criterion::{criterion_group, criterion_main, Criterion};
-use pwmp_msg::{mac::Mac, request::Request, version::Version, Message};
+use pwmp_msg::{
+    mac::Mac, measurement::MeasurementCollection, request::Request, version::Version, Message,
+};
 use std::hint::black_box;
 
 macro_rules! generate_benchmark {
@@ -30,7 +32,7 @@ generate_benchmark!(
     benchmark_request_post_measurements_deserialization,
     "Message(Request::PostMeasurements)::deserialize",
     Message::new_request(
-        Request::PostMeasurements {
+        Request::PostMeasurements(MeasurementCollection {
             temperature: 457,
             humidity: 45,
             air_pressure: Some(65520),
@@ -38,7 +40,7 @@ generate_benchmark!(
             battery: 4200,
             wifi_ssid: "Hello, World!".into(),
             wifi_rssi: -45,
-        },
+        }),
         55
     )
 );

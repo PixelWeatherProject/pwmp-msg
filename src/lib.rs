@@ -136,7 +136,7 @@ impl Message {
     /// let mut buffer = [0u8; 4];
     /// let bytes = message.serialize_into(&mut buffer).unwrap();
     ///
-    /// assert_eq!(bytes, &[1, 0, 4]);
+    /// assert_eq!(bytes, &[1, 0, 5]);
     /// ```
     ///
     /// In the following example, the buffer is too small to contain the data, so it fails:

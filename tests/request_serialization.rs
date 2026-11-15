@@ -1,6 +1,7 @@
 use pwmp_msg::{
     aliases::{BatteryVoltage, Temperature},
     mac::Mac,
+    measurement::MeasurementCollection,
     request::Request,
     version::Version,
     Message,
@@ -26,7 +27,7 @@ generate_test!(
 
 generate_test!(
     can_serialize_post_measurements,
-    Request::PostMeasurements {
+    Request::PostMeasurements(MeasurementCollection {
         temperature: Temperature::default(),
         humidity: 50,
         air_pressure: Some(u16::MAX),
@@ -34,7 +35,7 @@ generate_test!(
         battery: BatteryVoltage::default(),
         wifi_ssid: "ABC 123".into(),
         wifi_rssi: -15,
-    }
+    })
 );
 
 generate_test!(
