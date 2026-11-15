@@ -1,11 +1,14 @@
 //! Module for the `MeasurementColection` and helper types.
 
-use crate::aliases::{AirPressure, BatteryVoltage, Humidity, Rssi, Temperature};
+use crate::{
+    aliases::{AirPressure, BatteryVoltage, Humidity, Rssi, Temperature},
+    essid::WifiEssid,
+};
 use serde::{Deserialize, Serialize};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// A complete measurement data snapshot.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct MeasurementCollection {
     /// Temperature
     pub temperature: Temperature,
@@ -23,7 +26,7 @@ pub struct MeasurementCollection {
     pub cpu_temp: Temperature,
 
     /// ESSID of the wireless network
-    pub wifi_ssid: Box<str>,
+    pub wifi_ssid: WifiEssid,
 
     /// RSSI *(signal quality)* of the connection to the wireless network in dBm *(decibel meters)*.
     /// Higher values (closer to 0) mean a better quality.
@@ -97,5 +100,27 @@ impl HistoricMeasurement {
     #[must_use]
     pub const fn timestamp(&self) -> u64 {
         self.timestamp
+    }
+}
+
+impl MeasurementCollection {
+    /// Creates an empty collection.
+    #[must_use]
+    pub const fn const_new() -> Self {
+        Self {
+            temperature: 0,
+            humidity: 0,
+            air_pressure: None,
+            battery: 0,
+            cpu_temp: 0,
+            wifi_ssid: WifiEssid::const_new(),
+            wifi_rssi: 0,
+        }
+    }
+}
+
+impl Default for MeasurementCollection {
+    fn default() -> Self {
+        Self::const_new()
     }
 }

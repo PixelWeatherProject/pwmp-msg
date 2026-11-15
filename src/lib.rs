@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 
 pub mod aliases;
 pub mod artifact;
+pub mod essid;
 pub mod mac;
 pub mod measurement;
 pub mod request;

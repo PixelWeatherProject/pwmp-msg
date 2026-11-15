@@ -33,7 +33,7 @@ generate_test!(
         air_pressure: Some(u16::MAX),
         cpu_temp: Temperature::default(),
         battery: BatteryVoltage::default(),
-        wifi_ssid: "ABC 123".into(),
+        wifi_ssid: "ABC 123".try_into().unwrap(),
         wifi_rssi: -15,
     })
 );
@@ -48,7 +48,7 @@ generate_test!(
                 air_pressure: Some(u16::MAX),
                 cpu_temp: Temperature::default(),
                 battery: BatteryVoltage::default(),
-                wifi_ssid: "ABC 123".into(),
+                wifi_ssid: "ABC 123".try_into().unwrap(),
                 wifi_rssi: -15,
             },
             1_700_000_000

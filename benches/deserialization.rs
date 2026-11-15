@@ -42,7 +42,7 @@ generate_benchmark!(
             air_pressure: Some(65520),
             cpu_temp: 294,
             battery: 4200,
-            wifi_ssid: "Hello, World!".into(),
+            wifi_ssid: "Hello, World!".try_into().unwrap(),
             wifi_rssi: -45,
         }),
         55
@@ -62,7 +62,7 @@ generate_benchmark!(
                         air_pressure: Some(65520),
                         cpu_temp: 294,
                         battery: 4200,
-                        wifi_ssid: "Hello, World!".into(),
+                        wifi_ssid: "Hello, World!".try_into().unwrap(),
                         wifi_rssi: -45,
                     },
                     1_700_000_000 + i * 600
