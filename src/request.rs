@@ -1,9 +1,9 @@
 //! Contains the definition if a request message.
 
 use crate::{
-    aliases::{AirPressure, BatteryVoltage, Humidity, Rssi, Temperature},
     artifact::Artifact,
     mac::Mac,
+    measurement::{HistoricMeasurement, MeasurementCollection},
     version::Version,
 };
 use serde::{Deserialize, Serialize};
@@ -25,29 +25,10 @@ pub enum Request {
     },
 
     /// Post measurement results to the database.
-    PostMeasurements {
-        /// Temperature
-        temperature: Temperature,
+    PostMeasurements(MeasurementCollection),
 
-        /// Humidity
-        humidity: Humidity,
-
-        /// Air pressure *(if supported by the node)*
-        air_pressure: Option<AirPressure>,
-
-        /// Node's battery voltage
-        battery: BatteryVoltage,
-
-        /// CPU die temperature
-        cpu_temp: Temperature,
-
-        /// ESSID of the wireless network
-        wifi_ssid: Box<str>,
-
-        /// RSSI *(signal quality)* of the connection to the wireless network in dBm *(decibel meters)*.
-        /// Higher values (closer to 0) mean a better quality.
-        wifi_rssi: Rssi,
-    },
+    /// Post historic measurement results to the database.
+    PostHistoricMeasurements(Box<[HistoricMeasurement]>),
 
     /// Post diagnostic artifact.
     PostDiagnosticsArtifact {
