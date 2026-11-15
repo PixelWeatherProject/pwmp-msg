@@ -1,7 +1,7 @@
 use pwmp_msg::{
     aliases::{BatteryVoltage, Temperature},
     mac::Mac,
-    measurement::MeasurementCollection,
+    measurement::{HistoricMeasurement, MeasurementCollection},
     request::Request,
     version::Version,
     Message,
@@ -41,6 +41,36 @@ generate_test!(
         wifi_ssid: "ABC 123".into(),
         wifi_rssi: -15,
     })
+);
+
+generate_test!(
+    can_deserialize_post_historic_measurements,
+    Request::PostHistoricMeasurements(Box::new([
+        HistoricMeasurement::new(
+            MeasurementCollection {
+                temperature: Temperature::default(),
+                humidity: 50,
+                air_pressure: Some(u16::MAX),
+                battery: BatteryVoltage::default(),
+                cpu_temp: Temperature::default(),
+                wifi_ssid: "ABC 123".into(),
+                wifi_rssi: -15,
+            },
+            1_700_000_000
+        ),
+        HistoricMeasurement::new(
+            MeasurementCollection {
+                air_pressure: None,
+                ..MeasurementCollection::default()
+            },
+            u64::MAX
+        ),
+    ]))
+);
+
+generate_test!(
+    can_deserialize_empty_post_historic_measurements,
+    Request::PostHistoricMeasurements(Box::new([]))
 );
 
 generate_test!(

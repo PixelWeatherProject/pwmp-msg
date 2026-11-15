@@ -1,6 +1,10 @@
 use criterion::{criterion_group, criterion_main, Criterion};
 use pwmp_msg::{
-    mac::Mac, measurement::MeasurementCollection, request::Request, version::Version, Message,
+    mac::Mac,
+    measurement::{HistoricMeasurement, MeasurementCollection},
+    request::Request,
+    version::Version,
+    Message,
 };
 use std::hint::black_box;
 
@@ -46,6 +50,30 @@ generate_benchmark!(
 );
 
 generate_benchmark!(
+    benchmark_request_post_historic_measurements_deserialization,
+    "Message(Request::PostHistoricMeasurements)::deserialize",
+    Message::new_request(
+        Request::PostHistoricMeasurements(
+            (0..16)
+                .map(|i| HistoricMeasurement::new(
+                    MeasurementCollection {
+                        temperature: 457,
+                        humidity: 45,
+                        air_pressure: Some(65520),
+                        cpu_temp: 294,
+                        battery: 4200,
+                        wifi_ssid: "Hello, World!".into(),
+                        wifi_rssi: -45,
+                    },
+                    1_700_000_000 + i * 600
+                ))
+                .collect()
+        ),
+        55
+    )
+);
+
+generate_benchmark!(
     benchmark_request_send_notification_deserialization,
     "Message(Request::SendNotification)::deserialize",
     Message::new_request(Request::SendNotification("Hello, World!".into()), 55)
@@ -85,6 +113,7 @@ criterion_group!(
     benches,
     benchmark_request_hello_deserialization,
     benchmark_request_post_measurements_deserialization,
+    benchmark_request_post_historic_measurements_deserialization,
     benchmark_request_send_notification_deserialization,
     benchmark_request_get_settings_deserialization,
     benchmark_request_update_check_deserialization,
