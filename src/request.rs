@@ -35,14 +35,7 @@ pub enum Request {
     },
 
     /// Post historical measurements to the database.
-    PostHistoricMeasurements {
-        /// Sensor measurements.
-        measurements: Box<[HistoricMeasurement]>,
-
-        /// Wi-Fi statistics from the current run.
-        /// Historical stats are not available.
-        wifi_stats: WiFiStats,
-    },
+    PostHistoricMeasurements(Box<[HistoricMeasurement]>),
 
     /// Post diagnostic artifact.
     PostDiagnosticsArtifact {
